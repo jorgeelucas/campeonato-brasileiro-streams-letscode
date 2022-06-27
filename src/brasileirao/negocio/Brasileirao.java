@@ -1,6 +1,5 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.DataDoJogo;
 import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
@@ -11,15 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Brasileirao {
 
@@ -44,7 +38,7 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return jogos.stream().collect(Collectors.summarizingInt(jogo-> jogo.mandantePlacar() + jogo.visitantePlacar()));
+        return jogos.stream().filter(filtro).collect(Collectors.summarizingInt(jogo-> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
@@ -72,15 +66,29 @@ public class Brasileirao {
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
+
+        List<Resultado> resultados = jogos.stream()
+                .filter(filtro)
+                .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
+
+        return resultados.stream()
+                .collect(Collectors.toMap(
+                        resultado -> resultado,
+                        resultado -> (long) Collections.frequency(resultados, resultado),
+                        (a,b) -> a
+                ));
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+        Optional<Map.Entry<Resultado, Long>> max = todosOsPlacares().entrySet().stream()
+                .max(Comparator.comparingLong(Map.Entry::getValue));
+        return max.orElseThrow(()-> new RuntimeException("Error"));
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
+        Optional<Map.Entry<Resultado, Long>> min = todosOsPlacares().entrySet().stream()
+                .min(Comparator.comparingLong(Map.Entry::getValue));
+        return min.orElseThrow(()-> new RuntimeException("Error"));
     }
 
     private List<Time> todosOsTimes() {

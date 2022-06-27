@@ -25,6 +25,8 @@ public class TestandoBrasileirao {
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
+        brasileirao.todosOsPlacares();
+
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
         imprimirEstatisticas(brasileirao);
@@ -38,7 +40,7 @@ public class TestandoBrasileirao {
 
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());
         System.out.println("Estatisticas (Total de jogos) - " + statistics.getCount());
-        System.out.println("Estatisticas (Media de gols) - " + statistics.getAverage());
+        System.out.printf("Estatisticas (Media de gols) - %.2f%n" , statistics.getAverage());
 
         Map.Entry<Resultado, Long> placarMaisRepetido = brasileirao.placarMaisRepetido();
 

@@ -5,6 +5,7 @@ import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
+import brasileirao.resources.JogoBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,19 +15,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Brasileirao {
+
 
     private Map<Integer, List<Jogo>> brasileirao;
     private List<Jogo> jogos;
@@ -48,7 +44,7 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return jogos.stream().collect(Collectors.summarizingInt(jogo-> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
@@ -129,18 +125,28 @@ public class Brasileirao {
         return null;
     }
 
-    public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+    public List<Jogo> lerArquivo(Path file) throws IOException{
+        List<String> readFile = new ArrayList<>(Files.readAllLines(file));
+        readFile.remove(0);
+        readFile.replaceAll(line -> line.replace(":", "h"));
+
+        List<String[]> fieldsFile = readFile.stream().map(line -> line.split(";")).toList();
+        return fieldsFile.stream().map(
+                field -> new JogoBuilder().withRodada(field[0])
+                        .withData(field[1], isValidTime(field[2]), getDayOfWeek(field[3])).withMandante(field[4])
+                        .withVisitante(field[5]).withVencedor(field[6]).withArena(field[7])
+                        .withMandantePlacar(field[8]).withVisitantePlacar(field[9]).withEstadoMandante(field[10])
+                        .withEstadoVisitante(field[11]).withEstadoVencedor(field[12]).build()).toList();
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-feira", DayOfWeek.MONDAY,
+                "Terça-feira", DayOfWeek.TUESDAY,
+                "Quarta-feira", DayOfWeek.WEDNESDAY,
+                "Quinta-feira", DayOfWeek.THURSDAY,
+                "Sexta-feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }
@@ -159,5 +165,10 @@ public class Brasileirao {
         return null;
     }
 
-
+    private String isValidTime(String s){
+        if (s.isEmpty() || s.isBlank()){
+            return "16h00";
+        }
+        return s;
+    }
 }

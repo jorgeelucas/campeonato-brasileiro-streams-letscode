@@ -47,7 +47,6 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        //  return this.jogos.stream().collect(Collectors.groupingBy(Jogos::));
         return null;
     }
 
@@ -72,9 +71,13 @@ public class Brasileirao {
     }
 
     public Long totalJogosComMenosDe3Gols() {
+       // return jogos.stream().filter();
         return null;
     }
+public Integer retornarQuantidadeGolsPorJogo(){
+        return null;
 
+}
     public Long totalJogosCom3OuMaisGols() {
         return null;
     }
@@ -136,8 +139,8 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        List<String> jogosCsv = Files.lines(file).filter(item -> !item.startsWith("Rodada")).toList();
-        return jogosCsv.stream().map(item -> {
+        List<String> jogosCsv = Files.lines(file).toList();
+        return jogosCsv.stream().skip(1).map(item -> {
             String[] atributos = item.split(";");
             return criarJogo(atributos);
         }).collect(Collectors.toList());

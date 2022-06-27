@@ -6,7 +6,10 @@ import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
@@ -44,6 +47,7 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
+        //  return this.jogos.stream().collect(Collectors.groupingBy(Jogos::));
         return null;
     }
 
@@ -103,7 +107,8 @@ public class Brasileirao {
 
     /**
      * todos os jogos que cada time foi mandante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
         return null;
@@ -111,7 +116,8 @@ public class Brasileirao {
 
     /**
      * todos os jogos que cada time foi visitante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
         return null;
@@ -130,8 +136,29 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+        List<String> jogosCsv = Files.lines(file).filter(item -> !item.startsWith("Rodada")).toList();
+        return jogosCsv.stream().map(item -> {
+            String[] atributos = item.split(";");
+            return criarJogo(atributos);
+        }).collect(Collectors.toList());
     }
+
+    private Jogo criarJogo(String[] atributos) {
+        DataDoJogo dataDoJogo = criarDataJogo(atributos[1], atributos[2], atributos[3]);
+        return new Jogo(Integer.parseInt(atributos[0]), dataDoJogo, new Time(atributos[4]),
+                new Time(atributos[5]), new Time(atributos[6]),
+                atributos[7], Integer.parseInt(atributos[8]),
+                Integer.parseInt(atributos[9]), atributos[10], atributos[11], atributos[12]);
+    }
+
+    private DataDoJogo criarDataJogo(String dataJogo, String horarioJogo, String diaJogo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate data = LocalDate.parse(dataJogo, formatter);
+        LocalTime horario = (horarioJogo.isBlank() || horarioJogo.isEmpty()) ? null : LocalTime.parse(horarioJogo.replace("h", ":"));
+        DayOfWeek dia = getDayOfWeek(diaJogo);
+        return new DataDoJogo(data, horario, dia);
+    }
+
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(

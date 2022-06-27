@@ -1,10 +1,6 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.DataDoJogo;
-import brasileirao.dominio.Jogo;
-import brasileirao.dominio.PosicaoTabela;
-import brasileirao.dominio.Resultado;
-import brasileirao.dominio.Time;
+import brasileirao.dominio.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +36,6 @@ public class Brasileirao {
                 .collect(Collectors.groupingBy(
                         Jogo::rodada,
                         Collectors.mapping(Function.identity(), Collectors.toList())));
-
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
@@ -126,21 +121,45 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
+
+        Set<Time> nomeTimes = this.jogos.stream()
+                .filter(filtro)
+                .map(Jogo::mandante)
+                .collect(Collectors.toSet());
+
+        //nomeTimes.forEach(System.out::println);
         return null;
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+
+        List<String[]> linhasFile = Files.readAllLines(file).stream()
+                .map(linha -> linha.split(";")).toList();
+
+        return linhasFile.stream()
+                .skip(1)
+                .map(jogo -> new JogoBuilder().setRodada(jogo[0])
+                        .setDataDoJogo(jogo[1], jogo[2], getDayOfWeek(jogo[3]))
+                        .setMandante(jogo[4])
+                        .setVisitante(jogo[5])
+                        .setVencedor(jogo[6])
+                        .setArena(jogo[7])
+                        .setMandantePlacar(jogo[8])
+                        .setVisitantePlacar(jogo[9])
+                        .setEstadoMandante(jogo[10])
+                        .setEstadoVisitante(jogo[11])
+                        .setEstadoVencedor(jogo[12])
+                        .build()).toList();
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-feira", DayOfWeek.MONDAY,
+                "Terça-feira", DayOfWeek.TUESDAY,
+                "Quarta-feira", DayOfWeek.WEDNESDAY,
+                "Quinta-feira", DayOfWeek.THURSDAY,
+                "Sexta-feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }

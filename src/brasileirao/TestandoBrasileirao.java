@@ -25,15 +25,16 @@ public class TestandoBrasileirao {
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
-        Set<PosicaoTabela> posicoes = brasileirao.tabela();
+//        Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
         imprimirEstatisticas(brasileirao);
 
-        imprimirTabela(posicoes);
+//        imprimirTabela(posicoes);
 
     }
 
     private static void imprimirEstatisticas(Brasileirao brasileirao) {
+        System.out.println("entrou");
         IntSummaryStatistics statistics = brasileirao.estatisticasPorJogo();
 
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());

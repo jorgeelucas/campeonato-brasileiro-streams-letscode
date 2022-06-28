@@ -39,16 +39,26 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
+    public Map<Jogo, Double> mediaGolsPorJogo() {
         return null;
     }
-
     public IntSummaryStatistics estatisticasPorJogo() {
         return null;
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        //this.brasileirao.forEach((integer, jogos1) -> jogos1.stream().forEach(System.out::println));
+        List<Jogo> jogoList = new ArrayList<>();
+
+        this.brasileirao.forEach((integer, jogos1) -> jogoList.addAll(jogos1));
+        /*for (Integer integer : brasileirao.keySet()) {
+            List<Jogo> jogos = brasileirao.get(integer);
+            for (Jogo jogo : jogos) {
+                jogoList.add(jogo);
+            }
+        }*/
+
+        return jogoList;
     }
 
     public Long totalVitoriasEmCasa() {

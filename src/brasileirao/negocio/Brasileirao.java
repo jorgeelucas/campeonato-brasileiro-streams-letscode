@@ -39,11 +39,20 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Double> mediaGolsPorJogo() {
-        return null;
+    public Map<Jogo, Integer> mediaGolsPorJogo() {
+        List<Jogo> jogos = todosOsJogos();
+
+        return jogos
+                .stream()
+                .collect(Collectors.toMap(jogo -> jogo, jogo -> jogo.visitantePlacar()+jogo.mandantePlacar()));
     }
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+
+        return jogos
+                .stream()
+                .mapToInt(jogo -> jogo.mandantePlacar()+ jogo.visitantePlacar())
+                .summaryStatistics();
     }
 
     public List<Jogo> todosOsJogos() {

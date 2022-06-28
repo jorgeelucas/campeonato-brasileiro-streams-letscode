@@ -7,9 +7,7 @@ import brasileirao.negocio.Brasileirao;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.IntSummaryStatistics;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class TestandoBrasileirao {
@@ -24,6 +22,7 @@ public class TestandoBrasileirao {
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
+
 
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 

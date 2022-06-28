@@ -151,10 +151,6 @@ public class Brasileirao {
             throw new RuntimeException(e);
         }
 
-        /*for (Jogo jogo : jogoList) {
-            System.out.println(jogo.toString());
-        }*/
-
 
         return jogoList;
     }

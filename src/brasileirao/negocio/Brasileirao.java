@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Brasileirao {
 
@@ -42,33 +43,44 @@ public class Brasileirao {
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return jogos.stream().filter(filtro).toList();
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.mandantePlacar() > jogo.visitantePlacar())
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.visitantePlacar() > jogo.mandantePlacar())
+                .count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> Objects.equals(jogo.mandantePlacar(), jogo.visitantePlacar()))
+                .count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+        return todosOsJogos().stream()
+                .map(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())
+                .filter(gols -> gols < 3)
+                .count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        return todosOsJogos().stream()
+                .map(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())
+                .filter(gols -> gols > 3)
+                .count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
 
-        List<Resultado> resultados = jogos.stream()
-                .filter(filtro)
+        List<Resultado> resultados = todosOsJogos().stream()
                 .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
 
         return resultados.stream()
@@ -102,7 +114,7 @@ public class Brasileirao {
                 .map(Jogo::visitante)
                 .toList();
 
-        return null;
+        return Stream.of(mandantes, visitantes).flatMap(List::stream).toList();
     }
 
     /**
@@ -110,7 +122,7 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+        return todosOsJogos().stream().collect(Collectors.groupingBy(Jogo::mandante));
     }
 
     /**
@@ -118,7 +130,7 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+         return todosOsJogos().stream().collect(Collectors.groupingBy(Jogo::visitante));
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
@@ -135,10 +147,9 @@ public class Brasileirao {
 
     public List<Jogo> lerArquivo(Path file) throws IOException{
         List<String> readFile = new ArrayList<>(Files.readAllLines(file));
-        readFile.remove(0);
         readFile.replaceAll(line -> line.replace(":", "h"));
 
-        List<String[]> fieldsFile = readFile.stream().map(line -> line.split(";")).toList();
+        List<String[]> fieldsFile = readFile.stream().skip(1).map(line -> line.split(";")).toList();
         return fieldsFile.stream().map(
                 field -> new JogoBuilder().withRodada(field[0])
                         .withData(field[1], isValidTime(field[2]), getDayOfWeek(field[3])).withMandante(field[4])

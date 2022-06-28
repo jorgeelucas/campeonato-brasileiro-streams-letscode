@@ -71,23 +71,38 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+        return jogos
+                .stream()
+                .filter(jogo -> jogo.mandante().equals(jogo.vencedor())).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+        return jogos
+                .stream()
+                .filter(jogo -> jogo.visitante().equals(jogo.vencedor())).count();
     }
 
     public Long totalEmpates() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+        return jogos
+                .stream()
+                .filter(jogo -> (jogo.mandantePlacar() == jogo.visitantePlacar())).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+        return jogos
+                .stream()
+                .filter(jogo -> (jogo.mandantePlacar() + jogo.visitantePlacar()) < 3).count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        List<Jogo> jogos = todosOsJogos();
+        return jogos
+                .stream()
+                .filter(jogo -> (jogo.mandantePlacar() + jogo.visitantePlacar()) >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {

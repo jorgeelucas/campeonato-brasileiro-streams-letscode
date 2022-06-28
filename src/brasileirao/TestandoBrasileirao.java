@@ -16,10 +16,10 @@ public class TestandoBrasileirao {
 
         Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
 
-//        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
-//        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2017;
-//        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
+        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
+       Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
+ //       Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2020;
+       Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 

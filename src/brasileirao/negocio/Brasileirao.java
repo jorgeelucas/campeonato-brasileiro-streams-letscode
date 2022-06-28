@@ -10,13 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,31 +37,52 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return  this.jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.summarizingInt(
+                        jogo -> jogo.mandantePlacar()+jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return this.jogos;
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .filter(jogo -> jogo.mandantePlacar() > jogo.visitantePlacar())
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .filter(jogo -> jogo.mandantePlacar() < jogo.visitantePlacar())
+                .count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .map(Jogo::vencedor)
+                .filter(x -> x.nome().equals("-"))
+                .count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .map(jogo -> jogo.visitantePlacar() + jogo.mandantePlacar())
+                .filter(placar -> placar < 3)
+                .count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .map(jogo -> jogo.visitantePlacar() + jogo.mandantePlacar())
+                .filter(placar -> placar >= 3)
+                .count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
@@ -75,11 +90,50 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+
+        List<Resultado> resultados = jogos.stream()
+                .filter(filtro)
+                .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
+
+        Map<Resultado, Long> placarXRepeticao = resultados.stream()
+                .collect(Collectors.toMap(
+                        resultado -> resultado,
+                        resultado -> (long) Collections.frequency(resultados, resultado),
+                        (a, b) -> a
+                ));
+
+        placarXRepeticao.entrySet().stream().forEach(System.out::println);
+
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = placarXRepeticao.entrySet()
+                .stream()
+                .max(Comparator.comparing(Map.Entry::getValue));
+
+        if (!placarMaisRepetido.isPresent()){
+            throw new RuntimeException("Não existe jogo com maior número de repetição");
+        }
+        return placarMaisRepetido.get();
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
+        List<Resultado> resultados = jogos.stream()
+                .filter(filtro)
+                .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
+
+        Map<Resultado, Long> placarXRepeticao = resultados.stream()
+                .collect(Collectors.toMap(
+                        resultado -> resultado,
+                        resultado -> (long) Collections.frequency(resultados, resultado),
+                        (a, b) -> a
+                ));
+
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = placarXRepeticao.entrySet()
+                .stream()
+                .min(Comparator.comparing(Map.Entry::getValue));
+
+        if (!placarMaisRepetido.isPresent()){
+            throw new RuntimeException("Não existe jogo com menor número de repetição");
+        }
+        return placarMaisRepetido.get();
     }
 
     private List<Time> todosOsTimes() {
@@ -88,12 +142,12 @@ public class Brasileirao {
                 .map(Jogo::mandante)
                 .toList();
 
-        List<Time> visitantes = todosOsJogos()
-                .stream()
-                .map(Jogo::visitante)
-                .toList();
+//        List<Time> visitantes = todosOsJogos()
+//                .stream()
+//                .map(Jogo::visitante)
+//                .toList();
 
-        return null;
+        return mandantes;
     }
 
     /**
@@ -120,7 +174,7 @@ public class Brasileirao {
         return null;
     }
 
-    public Set<PosicaoTabela> tabela() {
+    public Set<PosicaoTabela> tabela() { // to do
 
         Set<Time> nomeTimes = this.jogos.stream()
                 .filter(filtro)
@@ -177,6 +231,5 @@ public class Brasileirao {
     private Map<Integer, Double> mediaDeGolsPorRodada() {
         return null;
     }
-
 
 }

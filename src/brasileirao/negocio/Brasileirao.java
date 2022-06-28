@@ -9,18 +9,14 @@ import brasileirao.dominio.Time;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -130,18 +126,50 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+        List<Jogo> jogoList = new ArrayList<>();
+
+        try (Stream<String> linhas = Files.lines(file).skip(1)) {
+                    linhas
+                        .map(linha -> linha.split(";"))
+                        .map(str -> new Jogo(
+                                Integer.parseInt(str[0]),
+                                new DataDoJogo( LocalDate.parse(str[1],DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                        str[2].isBlank() ? LocalTime.parse("00:00",DateTimeFormatter.ofPattern("HH:mm"))
+                                        : LocalTime.parse(str[2].replace("h",":"),DateTimeFormatter.ofPattern("HH:mm")),
+                                        getDayOfWeek(str[3].toLowerCase())),
+                                new Time(str[4]),
+                                new Time(str[5]),
+                                new Time(str[6]),
+                                str[7],
+                                Integer.parseInt(str[8]),
+                                Integer.parseInt(str[9]),
+                                str[10],
+                                str[11],
+                                str[12]))
+                        .forEach(jogo -> jogoList.add(jogo));
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        /*for (Jogo jogo : jogoList) {
+            System.out.println(jogo.toString());
+        }*/
+
+
+        return jogoList;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
-                "Domingo", DayOfWeek.SUNDAY
+                "segunda-feira", DayOfWeek.MONDAY,
+                "terça-feira", DayOfWeek.TUESDAY,
+                "terca-feira", DayOfWeek.TUESDAY,
+                "quarta-feira", DayOfWeek.WEDNESDAY,
+                "quinta-feira", DayOfWeek.THURSDAY,
+                "sexta-feira", DayOfWeek.FRIDAY,
+                "sábado", DayOfWeek.SATURDAY,
+                "sabado", DayOfWeek.SATURDAY,
+                "domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }
 

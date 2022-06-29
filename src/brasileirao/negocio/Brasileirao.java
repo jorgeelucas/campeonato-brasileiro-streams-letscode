@@ -6,6 +6,7 @@ import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,17 +15,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Locale.forLanguageTag;
 
 public class Brasileirao {
 
@@ -44,7 +43,16 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+        //Pegar a soma de gols de cada jogo, fazer a média de gols para cada jogo, retornar como um map
+
+        Function<Jogo, Integer> jogoIntegerFunction = jogo -> (jogo.mandantePlacar() + jogo.visitantePlacar())/2;
+
+        Map<Jogo, Integer> media = jogos
+                .stream()
+                .collect(Collectors.toMap(Function.identity(), jogoIntegerFunction));
+
+        return media;
+
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
@@ -130,7 +138,52 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+
+//        List<String[]> strings = Files.readAllLines(file)
+//                .stream()
+//                .map(line -> line.split(";"))
+//                .toList();
+//        strings.stream();
+
+        Scanner ler = new Scanner(file);
+        ler.nextLine();
+
+        List<Jogo> jogos = new ArrayList<>();
+
+        while (ler.hasNextLine()) {
+            String linha = ler.next();
+            Scanner scLinha = new Scanner(linha);
+            Scanner sc = scLinha.useDelimiter(";");
+
+            Integer rodada = sc.nextInt();
+
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse(sc.next(), dtf);
+
+            String time = sc.next();
+            if (time.contains("h")) time.replace("h", ":");
+            LocalTime localTime = LocalTime.parse(time);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE", forLanguageTag("pt-br"));
+            TemporalAccessor accessor = formatter.parse(sc.next());
+            DayOfWeek dayOfWeek = DayOfWeek.from(accessor);
+
+            Time timeMandante = new Time(sc.next());
+            Time timeVisitante = new Time(sc.next());
+            Time vencedor = new Time(sc.next());
+            String arena = sc.next();
+            Integer mandantePlacar = sc.nextInt();
+            Integer visitantePlacar = sc.nextInt();
+            String estadoMandante = sc.next();
+            String estadoVisitante = sc.next();
+            String estadoVencedor = sc.next();
+
+            DataDoJogo dataDoJogo = new DataDoJogo(localDate, localTime, dayOfWeek);
+
+            jogos.add(new Jogo(rodada, dataDoJogo, timeMandante, timeVisitante, vencedor, arena, mandantePlacar, visitantePlacar, estadoMandante, estadoVisitante, estadoVencedor));
+        }
+
+        return jogos;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {

@@ -17,16 +17,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Brasileirao {
@@ -51,7 +46,14 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        IntSummaryStatistics intSummaryStatistics
+                = new IntSummaryStatistics();
+
+        //VERIFICAR SE PRECISA O FILTRO*
+//        jogos.stream().filter(filtro).forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
+        jogos.forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
+
+        return intSummaryStatistics;
     }
 
     public List<Jogo> todosOsJogos() {
@@ -59,27 +61,30 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return jogos.stream().filter(placar -> placar.mandantePlacar() > placar.visitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return jogos.stream().filter(placar -> placar.visitantePlacar() > placar.mandantePlacar()).count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return jogos.stream().filter(jogo -> jogo.visitantePlacar().equals(jogo.mandantePlacar())).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-       // return jogos.stream().filter();
-        return null;
+        return jogos.stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) < 3).count();
     }
-public Integer retornarQuantidadeGolsPorJogo(){
-        return null;
 
-}
+    public Integer retornarQuantidadeGolsPorJogo(Jogo jogo) {
+        return jogo.visitantePlacar() + jogo.mandantePlacar();
+//        return jogos.stream().map(jogo -> {
+//            return jogo.visitantePlacar() + jogo.mandantePlacar();
+//        }).collect(Collectors.summingInt(Integer::intValue));
+    }
+
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        return jogos.stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
@@ -137,6 +142,7 @@ public Integer retornarQuantidadeGolsPorJogo(){
     public Set<PosicaoTabela> tabela() {
         return null;
     }
+
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
         List<String> jogosCsv = Files.lines(file).toList();

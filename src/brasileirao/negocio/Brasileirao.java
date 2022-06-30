@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
@@ -19,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.LongBinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -87,17 +89,27 @@ public class Brasileirao {
         return jogos.stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) >= 3).count();
     }
 
+    //FAZ SENTIDO INFORMAR OS PLACARES SEM INFORMAR OS TIMES
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
+
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors
+                        .toMap(
+                                jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar()),
+                                jogo -> 1L,
+                                (original, novo) -> original + 1L));
     }
 
+    //O QUE CONSIDERAR QUANDO HOUVER MAIS DE UMA COMBINAÇÃO DE PLACAR REPETIDO
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+        return todosOsPlacares().entrySet().stream().max(
+                (placar1, placar2) -> placar1.getValue() > placar2.getValue() ? 1 : -1).orElse(null);
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
-    }
+        return todosOsPlacares().entrySet().stream().max(
+                (placar1, placar2) -> placar1.getValue() < placar2.getValue() ? 1 : -1).orElse(null);    }
 
     private List<Time> todosOsTimes() {
         List<Time> mandantes = todosOsJogos()

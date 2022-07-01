@@ -14,13 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -103,7 +97,8 @@ public class Brasileirao {
 
     /**
      * todos os jogos que cada time foi mandante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
         return null;
@@ -111,7 +106,8 @@ public class Brasileirao {
 
     /**
      * todos os jogos que cada time foi visitante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
         return null;
@@ -130,17 +126,49 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+
+        return Files.lines(file)
+                .skip(1)
+                .map(strings -> Arrays.asList(strings.split(";")))
+                .map(this::convertListStringToJogo)
+                .toList();
+
+    }
+
+    private Jogo convertListStringToJogo(List<String> listString) {
+        Integer rodada = Integer.valueOf(listString.get(0));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        LocalDate data = LocalDate.parse(listString.get(1), formatter);
+        LocalTime horario = LocalTime.of(16, 00);
+
+        if (listString.get(2).contains("h") || listString.get(2).contains(":")) {
+            String[] hours = listString.get(2).split("h|:");
+            horario = LocalTime.of(Integer.valueOf(hours[0]).intValue(), Integer.valueOf(hours[1]).intValue());
+        }
+        DayOfWeek dia = getDayOfWeek(listString.get(3));
+        DataDoJogo dataDoJogo = new DataDoJogo(data, horario, dia);
+        Time mandante = new Time(listString.get(4));
+        Time visitante = new Time(listString.get(5));
+        Time vencedor = new Time(listString.get(6));
+        String arena = listString.get(7);
+        Integer mandantePlacar = Integer.valueOf(listString.get(8));
+        Integer visitantePlacar = Integer.valueOf(listString.get(9));
+        String estadoMandante = listString.get(10);
+        String estadoVisitante = listString.get(11);
+        String estadoVencedor = listString.get(12);
+        return new Jogo(rodada, dataDoJogo, mandante, visitante, vencedor, arena, mandantePlacar, visitantePlacar, estadoMandante, estadoVisitante, estadoVencedor);
+
+
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-feira", DayOfWeek.MONDAY,
+                "Terça-feira", DayOfWeek.TUESDAY,
+                "Quarta-feira", DayOfWeek.WEDNESDAY,
+                "Quinta-feira", DayOfWeek.THURSDAY,
+                "Sexta-feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }

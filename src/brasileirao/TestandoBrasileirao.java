@@ -24,7 +24,8 @@ public class TestandoBrasileirao {
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
-//        Set<PosicaoTabela> posicoes = brasileirao.tabela();
+
+        Set<PosicaoTabela> posicoes = brasileirao.tabela();
 //
 //        imprimirEstatisticas(brasileirao);
 //

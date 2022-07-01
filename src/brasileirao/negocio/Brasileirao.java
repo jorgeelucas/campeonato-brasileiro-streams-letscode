@@ -46,11 +46,13 @@ public class Brasileirao {
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return jogos.stream().filter(filtro).toList();
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.vencedor().equals(jogo.mandante()))
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
@@ -82,17 +84,11 @@ public class Brasileirao {
     }
 
     private List<Time> todosOsTimes() {
-        List<Time> mandantes = todosOsJogos()
+
+        return todosOsJogos()
                 .stream()
                 .map(Jogo::mandante)
                 .toList();
-
-        List<Time> visitantes = todosOsJogos()
-                .stream()
-                .map(Jogo::visitante)
-                .toList();
-
-        return null;
     }
 
     /**

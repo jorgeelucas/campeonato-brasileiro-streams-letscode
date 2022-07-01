@@ -27,7 +27,7 @@ public class TestandoBrasileirao {
 
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 //
-//        imprimirEstatisticas(brasileirao);
+        imprimirEstatisticas(brasileirao);
 //
 //        imprimirTabela(posicoes);
 

@@ -38,11 +38,16 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+        return todosOsJogos().stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()
+                ));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return todosOsJogos().stream()
+                .collect(Collectors.summarizingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
@@ -56,11 +61,15 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.vencedor().equals(jogo.visitante()))
+                .count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.mandantePlacar().equals(jogo.visitantePlacar()))
+                .count();
     }
 
     public Long totalJogosComMenosDe3Gols() {

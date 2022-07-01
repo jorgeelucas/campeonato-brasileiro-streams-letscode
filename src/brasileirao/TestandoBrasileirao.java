@@ -25,15 +25,11 @@ public class TestandoBrasileirao {
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
-        //brasileirao.todosOsJogosPorTimeComoMandantes();
-        //brasileirao.todosOsJogosPorTimeComoVisitante();
-        brasileirao.todosOsJogosPorTime();
+        Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
-        //Set<PosicaoTabela> posicoes = brasileirao.tabela();
+        imprimirEstatisticas(brasileirao);
 
-        //imprimirEstatisticas(brasileirao);
-
-        //imprimirTabela(posicoes);
+        imprimirTabela(posicoes);
 
     }
 

@@ -34,12 +34,17 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+    public Map<Jogo, Double> mediaGolsPorJogo() {
+        return todosOsJogos().stream().collect(Collectors.groupingBy(
+                Function.identity(),
+                Collectors.averagingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())
+        ));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return jogos.stream().filter(filtro).collect(Collectors.summarizingInt(jogo-> jogo.mandantePlacar() + jogo.visitantePlacar()));
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.summarizingInt(jogo-> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
@@ -134,7 +139,15 @@ public class Brasileirao {
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
-        return null;
+        return Stream.of(todosOsJogosPorTimeComoMandantes(), todosOsJogosPorTimeComoVisitante())
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> {
+                            v1.addAll(v2);
+                            return v1;
+                        }));
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
@@ -142,7 +155,13 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
-        return null;
+
+        List<PosicaoTabela> collect = todosOsJogosPorTime().keySet().stream().map(
+                        time -> new PosicaoTabela(time, totalDeVitoriasPorTime(time), totalDeDerrotasPorTime(time),
+                                totalDeEmpatesPorTime(time), totalDeGolsPorTime(time) - totalDeSofridosPorTime(time),
+                                totalDeSofridosPorTime(time), totalDeGolsPorTime(time)))
+                .sorted(Comparator.comparing(PosicaoTabela::getPontuacaoTotal).reversed()).toList();
+        return new LinkedHashSet<>(collect);
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException{
@@ -152,7 +171,7 @@ public class Brasileirao {
         List<String[]> fieldsFile = readFile.stream().skip(1).map(line -> line.split(";")).toList();
         return fieldsFile.stream().map(
                 field -> new JogoBuilder().withRodada(field[0])
-                        .withData(field[1], isValidTime(field[2]), getDayOfWeek(field[3])).withMandante(field[4])
+                        .withData(field[1], shouldReturnDefaultTimeIfTheGivenIsEmpty(field[2]), getDayOfWeek(field[3])).withMandante(field[4])
                         .withVisitante(field[5]).withVencedor(field[6]).withArena(field[7])
                         .withMandantePlacar(field[8]).withVisitantePlacar(field[9]).withEstadoMandante(field[10])
                         .withEstadoVisitante(field[11]).withEstadoVencedor(field[12]).build()).toList();
@@ -173,18 +192,54 @@ public class Brasileirao {
     // METODOS EXTRA
 
     private Map<Integer, Integer> totalGolsPorRodada() {
-        return null;
+        return todosOsJogos().stream().collect(Collectors.toMap(
+                Jogo::rodada,
+                jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
-    private Map<Time, Integer> totalDeGolsPorTime() {
-        return null;
+    private Long totalDeVitoriasPorTime(Time time){
+        return todosOsJogosPorTime().get(time).stream().filter(x -> x.vencedor().equals(time)).count();
+    }
+
+    private Long totalDeDerrotasPorTime(Time time){
+        return todosOsJogosPorTime().get(time).stream().filter(x -> !x.vencedor().equals(time)).count();
+    }
+
+    private Long totalDeEmpatesPorTime(Time time){
+        return todosOsJogosPorTime().get(time).stream().filter(x -> x.estadoVencedor().equals("-")).count();
+    }
+
+    private Long totalDeGolsPorTime(Time time){
+       return (long) todosOsJogosPorTime().get(time).stream().mapToInt(
+                x -> {
+                    if (x.mandante().equals(time)){
+                        return x.mandantePlacar();
+                    } else if (x.visitante().equals(time)){
+                        return x.visitantePlacar();
+                    }
+                    return 0;
+                }).sum();
+    }
+
+    private Long totalDeSofridosPorTime(Time time){
+        return (long) todosOsJogosPorTime().get(time).stream().mapToInt(
+                x -> {
+                    if (!x.mandante().equals(time)){
+                        return x.mandantePlacar();
+                    } else if (!x.visitante().equals(time)){
+                        return x.visitantePlacar();
+                    }
+                    return 0;
+                }).sum();
     }
 
     private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
+        return todosOsJogos().stream().collect(Collectors.groupingBy(
+                Jogo::rodada,
+                Collectors.averagingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())));
     }
 
-    private String isValidTime(String s){
+    private String shouldReturnDefaultTimeIfTheGivenIsEmpty(String s){
         if (s.isEmpty() || s.isBlank()){
             return "16h00";
         }

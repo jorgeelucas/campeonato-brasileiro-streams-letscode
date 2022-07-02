@@ -11,8 +11,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,8 +34,14 @@ public class Brasileirao {
                         Collectors.mapping(Function.identity(), Collectors.toList())));
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+    //public Map<Jogo, Integer> mediaGolsPorJogo() {
+    public Map<Jogo, Double> mediaGolsPorJogo() {
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.averagingDouble(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())
+                ));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
@@ -65,7 +73,7 @@ public class Brasileirao {
         return jogos.stream()
                 .filter(filtro)
                 .map(Jogo::vencedor)
-                .filter(x -> x.nome().equals("-"))
+                .filter(time -> time.nome().equals("-"))
                 .count();
     }
 
@@ -86,25 +94,23 @@ public class Brasileirao {
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
-    }
-
-    public Map.Entry<Resultado, Long> placarMaisRepetido() {
 
         List<Resultado> resultados = jogos.stream()
                 .filter(filtro)
                 .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
 
-        Map<Resultado, Long> placarXRepeticao = resultados.stream()
+        return resultados.stream()
                 .collect(Collectors.toMap(
                         resultado -> resultado,
                         resultado -> (long) Collections.frequency(resultados, resultado),
                         (a, b) -> a
                 ));
+    }
 
-        placarXRepeticao.entrySet().stream().forEach(System.out::println);
+    public Map.Entry<Resultado, Long> placarMaisRepetido() {
 
-        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = placarXRepeticao.entrySet()
+        Map<Resultado, Long> todosPlacares = todosOsPlacares();
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = todosPlacares.entrySet()
                 .stream()
                 .max(Comparator.comparing(Map.Entry::getValue));
 
@@ -115,18 +121,9 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        List<Resultado> resultados = jogos.stream()
-                .filter(filtro)
-                .map(jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar())).toList();
 
-        Map<Resultado, Long> placarXRepeticao = resultados.stream()
-                .collect(Collectors.toMap(
-                        resultado -> resultado,
-                        resultado -> (long) Collections.frequency(resultados, resultado),
-                        (a, b) -> a
-                ));
-
-        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = placarXRepeticao.entrySet()
+        Map<Resultado, Long> todosPlacares = todosOsPlacares();
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = todosPlacares.entrySet()
                 .stream()
                 .min(Comparator.comparing(Map.Entry::getValue));
 
@@ -142,11 +139,6 @@ public class Brasileirao {
                 .map(Jogo::mandante)
                 .toList();
 
-//        List<Time> visitantes = todosOsJogos()
-//                .stream()
-//                .map(Jogo::visitante)
-//                .toList();
-
         return mandantes;
     }
 
@@ -155,7 +147,9 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(Jogo::mandante));
     }
 
     /**
@@ -163,26 +157,90 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(Jogo::visitante));
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
-        return null;
+
+        Map<Time, List<Jogo>> jogosMandante = todosOsJogosPorTimeComoMandantes();
+        Map<Time, List<Jogo>> jogosVisitante = todosOsJogosPorTimeComoVisitante();
+        Map<Time, List<Jogo>> todosJogoPortime = Stream.of(jogosMandante, jogosVisitante)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> {
+                            v1.addAll(v2);
+                            return v1;
+                        }
+                ));
+
+       //        System.out.println("lista mandante");
+//        jogosMandante.entrySet().forEach(System.out::println);
+//        System.out.println("lista visitante");
+//        jogosVisitante.entrySet().forEach(System.out::println);
+//        System.out.println("lista total");
+//        todosJogoPortime.entrySet().forEach(System.out::println);
+
+        return todosJogoPortime;
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
-        return null;
+
+        Map<Time, Map<Boolean, List<Jogo>>> collect = todosOsJogosPorTime()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map -> Map.getValue().stream()
+                                        .collect(Collectors.groupingBy(Jogo -> Jogo.mandante().nome().equals(Map.getKey().nome())))
+                        )
+                );
+
+//        System.out.println("Relação de jogos mandante por visitante");
+//        collect.entrySet().forEach(System.out::println);
+
+        return collect;
     }
 
     public Set<PosicaoTabela> tabela() { // to do
 
-        Set<Time> nomeTimes = this.jogos.stream()
-                .filter(filtro)
-                .map(Jogo::mandante)
-                .collect(Collectors.toSet());
+        List<PosicaoTabela> collect = todosOsJogosPorTime().entrySet().stream()
+                .map(Map -> {
+                    Time time = Map.getKey();
 
-        //nomeTimes.forEach(System.out::println);
-        return null;
+                    Long vitorias = Map.getValue().stream()
+                            .filter(jogo -> jogo.vencedor().nome().equals(Map.getKey().nome())).count();
+                    Long diferenteDeVitoria = Map.getValue().stream()
+                            .filter(jogo -> !jogo.vencedor().nome().equals(Map.getKey().nome())).count();
+                    Long empates = Map.getValue().stream()
+                            .filter(jogo -> jogo.vencedor().nome().equals("-")).count();
+                    Long derrotas = diferenteDeVitoria - empates;
+
+                    Integer golsPositivosComoMandante = Map.getValue().stream()
+                            .filter(jogo -> jogo.mandante().equals(Map.getKey()))
+                            .map(Jogo::mandantePlacar).reduce(0, Integer::sum);
+                    Integer golsPositivosComoVisitante = Map.getValue().stream()
+                            .filter(jogo -> jogo.visitante().equals(Map.getKey()))
+                            .map(Jogo::visitantePlacar).reduce(0, Integer::sum);
+                    Integer golsNegativosComoMandante = Map.getValue().stream()
+                            .filter(jogo -> jogo.mandante().equals(Map.getKey()))
+                            .map(Jogo::visitantePlacar).reduce(0, Integer::sum);
+                    Integer golsNegativosComoVisitante = Map.getValue().stream()
+                            .filter(jogo -> jogo.visitante().equals(Map.getKey()))
+                            .map(Jogo::mandantePlacar).reduce(0, Integer::sum);
+
+                    Long golsPositivos = Long.valueOf(golsPositivosComoMandante + golsPositivosComoVisitante);
+                    Long golsSofridos = Long.valueOf(golsNegativosComoMandante + golsNegativosComoVisitante);
+                    Long saldoDeGols = golsPositivos - golsSofridos;
+
+                    return new PosicaoTabela(time, vitorias, derrotas, empates, golsPositivos, golsSofridos, saldoDeGols);
+                }).sorted(Comparator.comparing(PosicaoTabela::getPontuacaoTotal).reversed())
+                .toList();
+
+        return new LinkedHashSet<>(collect);
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
@@ -221,15 +279,54 @@ public class Brasileirao {
     // METODOS EXTRA
 
     private Map<Integer, Integer> totalGolsPorRodada() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(
+                        Jogo::rodada,
+                        Collectors.summingInt(jogo -> jogo.visitantePlacar() + jogo.mandantePlacar())
+                ));
     }
 
     private Map<Time, Integer> totalDeGolsPorTime() {
-        return null;
+
+        Map<Time, Integer> totalGolsTimeMandante = todosOsJogosPorTimeComoMandantes().entrySet().stream().
+                collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map -> Map.getValue().stream()
+                                .map(Jogo::mandantePlacar).reduce(0, Integer::sum)));
+
+
+        Map<Time, Integer> totalGolsTimeVisitante = todosOsJogosPorTimeComoVisitante().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map -> Map.getValue().stream()
+                                .map(Jogo::visitantePlacar).reduce(0, Integer::sum)));
+
+
+        Map<Time, Integer> totalGolsPorTime = Stream.of(totalGolsTimeMandante, totalGolsTimeVisitante)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        Integer::sum
+                ));
+
+//        System.out.println("total de gol por mandante");
+//        totalGolsTimeMandante.entrySet().forEach(System.out::println);
+//        System.out.println("total de gol por visitante");
+//        totalGolsTimeVisitante.entrySet().forEach(System.out::println);
+//        System.out.println("total de gols por time");
+//        totalGolsPorTime.entrySet().forEach(System.out::println);
+
+        return totalGolsPorTime;
     }
 
     private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(
+                        Jogo::rodada,
+                        Collectors.averagingDouble(jogo -> jogo.visitantePlacar() + jogo.mandantePlacar())
+                ));
     }
-
 }

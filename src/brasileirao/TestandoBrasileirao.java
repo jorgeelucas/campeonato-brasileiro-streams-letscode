@@ -25,16 +25,15 @@ public class TestandoBrasileirao {
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
-//        Set<PosicaoTabela> posicoes = brasileirao.tabela();
+        Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
         imprimirEstatisticas(brasileirao);
 
-//        imprimirTabela(posicoes);
+        imprimirTabela(posicoes);
 
     }
 
     private static void imprimirEstatisticas(Brasileirao brasileirao) {
-        System.out.println("entrou");
         IntSummaryStatistics statistics = brasileirao.estatisticasPorJogo();
 
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());
@@ -64,6 +63,10 @@ public class TestandoBrasileirao {
         System.out.println("Estatisticas (Vitorias Fora de casa) - " + vitoriasForaDeCasa);
         System.out.println("Estatisticas (Vitorias Em casa) - " + totalVitoriasEmCasa);
         System.out.println("Estatisticas (Empates) - " + empates);
+
+        //brasileirao.todosOsJogosPorTime();
+        //brasileirao.totalDeGolsPorTime();
+        //brasileirao.jogosParticionadosPorMandanteTrueVisitanteFalse();
     }
 
     public static void imprimirTabela(Set<PosicaoTabela> posicoes) {

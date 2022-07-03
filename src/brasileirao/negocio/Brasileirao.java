@@ -45,6 +45,9 @@ public class Brasileirao {
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
         return null;
+        //        return jogos.stream().map(jogo -> {
+//            return jogo.visitantePlacar() + jogo.mandantePlacar();
+//        }).collect(Collectors.summingInt(Integer::intValue));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
@@ -53,47 +56,42 @@ public class Brasileirao {
 
         //VERIFICAR SE PRECISA O FILTRO*
 //        jogos.stream().filter(filtro).forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
-        jogos.forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
+        todosOsJogos().forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
 
         return intSummaryStatistics;
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return jogos.stream().filter(filtro).toList();
     }
 
     public Long totalVitoriasEmCasa() {
-        return jogos.stream().filter(placar -> placar.mandantePlacar() > placar.visitantePlacar()).count();
+        return todosOsJogos().stream().filter(placar -> placar.mandantePlacar() > placar.visitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return jogos.stream().filter(placar -> placar.visitantePlacar() > placar.mandantePlacar()).count();
+        return todosOsJogos().stream().filter(placar -> placar.visitantePlacar() > placar.mandantePlacar()).count();
     }
 
     public Long totalEmpates() {
-        return jogos.stream().filter(jogo -> jogo.visitantePlacar().equals(jogo.mandantePlacar())).count();
+        return todosOsJogos().stream().filter(jogo -> jogo.visitantePlacar().equals(jogo.mandantePlacar())).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return jogos.stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) < 3).count();
+        return todosOsJogos().stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) < 3).count();
     }
 
     public Integer retornarQuantidadeGolsPorJogo(Jogo jogo) {
         return jogo.visitantePlacar() + jogo.mandantePlacar();
-//        return jogos.stream().map(jogo -> {
-//            return jogo.visitantePlacar() + jogo.mandantePlacar();
-//        }).collect(Collectors.summingInt(Integer::intValue));
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return jogos.stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) >= 3).count();
+        return todosOsJogos().stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) >= 3).count();
     }
 
-    //FAZ SENTIDO INFORMAR OS PLACARES SEM INFORMAR OS TIMES
     public Map<Resultado, Long> todosOsPlacares() {
 
-        return jogos.stream()
-                .filter(filtro)
+        return todosOsJogos().stream()
                 .collect(Collectors
                         .toMap(
                                 jogo -> new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar()),
@@ -109,7 +107,8 @@ public class Brasileirao {
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
         return todosOsPlacares().entrySet().stream().max(
-                (placar1, placar2) -> placar1.getValue() < placar2.getValue() ? 1 : -1).orElse(null);    }
+                (placar1, placar2) -> placar1.getValue() < placar2.getValue() ? 1 : -1).orElse(null);
+    }
 
     private List<Time> todosOsTimes() {
         List<Time> mandantes = todosOsJogos()
@@ -131,7 +130,14 @@ public class Brasileirao {
      * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+
+//        Map<Time, List<Jogo>> mapJogo = new HashMap<>();
+//        for (Jogo jogo : jogos) {
+//            mapJogo.put(jogo.mandante(), getListaJogosMandantes(jogo.mandante()));
+//        }
+
+        return todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::mandante));
     }
 
     /**
@@ -140,11 +146,22 @@ public class Brasileirao {
      * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+
+        return todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::visitante));
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
-        return null;
+
+        return Stream.of(todosOsJogosPorTimeComoMandantes(), todosOsJogosPorTimeComoVisitante())
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (mandante, visitante) -> {
+                            mandante.addAll(visitante);
+                            return mandante;
+                        }));
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {

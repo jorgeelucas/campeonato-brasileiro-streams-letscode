@@ -1,29 +1,18 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.DataDoJogo;
-import brasileirao.dominio.Jogo;
-import brasileirao.dominio.PosicaoTabela;
-import brasileirao.dominio.Resultado;
-import brasileirao.dominio.Time;
+import brasileirao.dominio.*;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.LongBinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Brasileirao {
@@ -44,8 +33,12 @@ public class Brasileirao {
     }
 
     //FAZ SENTIDO ESSE MÉTODO? COMO É MEDIA NÃO DEVERIA SER UM DOUBLE?
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+//    public Map<Jogo, Integer> mediaGolsPorJogo() {
+//        return null;
+//    }
+
+    public double mediaGolsPorJogo() {
+        return estatisticasPorJogo().getAverage();
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
@@ -103,8 +96,8 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return todosOsPlacares().entrySet().stream().max(
-                (placar1, placar2) -> placar1.getValue() < placar2.getValue() ? 1 : -1).orElse(null);
+        return todosOsPlacares().entrySet().stream().min(
+                (placar1, placar2) -> placar1.getValue() > placar2.getValue() ? 1 : -1).orElse(null);
     }
 
     //FAZ SENTIDO??
@@ -179,7 +172,12 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
-        return todosOsTimes().stream().map(this::criarPosicaoTabela).collect(Collectors.toSet());
+
+        Comparator<PosicaoTabela> comp = (s1, s2) -> s2.getPontuacaoTotal().compareTo(s1.getPontuacaoTotal());
+
+        return todosOsTimes().stream()
+                .map(this::criarPosicaoTabela)
+                .sorted(comp).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private PosicaoTabela criarPosicaoTabela(Time time) {
@@ -218,7 +216,7 @@ public class Brasileirao {
         return jogosCsv.stream().skip(1).map(item -> {
             String[] atributos = item.split(";");
             return criarJogo(atributos);
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private Jogo criarJogo(String[] atributos) {
@@ -240,12 +238,12 @@ public class Brasileirao {
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-feira", DayOfWeek.MONDAY,
+                "Terça-feira", DayOfWeek.TUESDAY,
+                "Quarta-feira", DayOfWeek.WEDNESDAY,
+                "Quinta-feira", DayOfWeek.THURSDAY,
+                "Sexta-feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }

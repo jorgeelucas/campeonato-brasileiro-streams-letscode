@@ -18,10 +18,10 @@ public class TestandoBrasileirao {
 
         Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
 
-//        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
-//        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
-//        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
+        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
+        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
+//        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
+        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
@@ -63,6 +63,12 @@ public class TestandoBrasileirao {
         System.out.println("Estatisticas (Vitorias Fora de casa) - " + vitoriasForaDeCasa);
         System.out.println("Estatisticas (Vitorias Em casa) - " + totalVitoriasEmCasa);
         System.out.println("Estatisticas (Empates) - " + empates);
+
+
+        System.out.println("totalGolsPorRodada - " + brasileirao.totalGolsPorRodada());
+        System.out.println("totalDeGolsPorTime - " + brasileirao.totalDeGolsPorTime());
+        System.out.println("mediaDeGolsPorRodada - " + brasileirao.mediaDeGolsPorRodada());
+
     }
 
     public static void imprimirTabela(Set<PosicaoTabela> posicoes) {

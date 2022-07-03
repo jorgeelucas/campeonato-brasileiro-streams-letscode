@@ -43,24 +43,21 @@ public class Brasileirao {
 
     }
 
+    //FAZ SENTIDO ESSE MÉTODO? COMO É MEDIA NÃO DEVERIA SER UM DOUBLE?
     public Map<Jogo, Integer> mediaGolsPorJogo() {
         return null;
-        //        return jogos.stream().map(jogo -> {
-//            return jogo.visitantePlacar() + jogo.mandantePlacar();
-//        }).collect(Collectors.summingInt(Integer::intValue));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
         IntSummaryStatistics intSummaryStatistics
                 = new IntSummaryStatistics();
 
-        //VERIFICAR SE PRECISA O FILTRO*
-//        jogos.stream().filter(filtro).forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
         todosOsJogos().forEach(jogo -> intSummaryStatistics.accept(retornarQuantidadeGolsPorJogo(jogo)));
 
         return intSummaryStatistics;
     }
 
+    //É ISSO MESMO?
     public List<Jogo> todosOsJogos() {
         return jogos.stream().filter(filtro).toList();
     }
@@ -81,7 +78,7 @@ public class Brasileirao {
         return todosOsJogos().stream().filter(jogo -> retornarQuantidadeGolsPorJogo(jogo) < 3).count();
     }
 
-    public Integer retornarQuantidadeGolsPorJogo(Jogo jogo) {
+    private Integer retornarQuantidadeGolsPorJogo(Jogo jogo) {
         return jogo.visitantePlacar() + jogo.mandantePlacar();
     }
 
@@ -110,6 +107,7 @@ public class Brasileirao {
                 (placar1, placar2) -> placar1.getValue() < placar2.getValue() ? 1 : -1).orElse(null);
     }
 
+    //FAZ SENTIDO??
     private List<Time> todosOsTimes() {
         List<Time> mandantes = todosOsJogos()
                 .stream()
@@ -121,7 +119,9 @@ public class Brasileirao {
                 .map(Jogo::visitante)
                 .toList();
 
-        return null;
+        return Stream.concat(
+                mandantes.stream(),
+                visitantes.stream()).toList();
     }
 
     /**
@@ -165,11 +165,51 @@ public class Brasileirao {
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
-        return null;
+
+        return Stream.of(todosOsJogosPorTime())
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        item -> jogosParticionadosPorMandanteVisitante(item.getKey(), item.getValue())));
+
+    }
+
+    private Map<Boolean, List<Jogo>> jogosParticionadosPorMandanteVisitante(Time time, List<Jogo> jogosPorTime) {
+        return jogosPorTime.stream().collect(Collectors.groupingBy(item -> item.mandante().equals(time)));
     }
 
     public Set<PosicaoTabela> tabela() {
-        return null;
+        return todosOsTimes().stream().map(this::criarPosicaoTabela).collect(Collectors.toSet());
+    }
+
+    private PosicaoTabela criarPosicaoTabela(Time time) {
+        List<Jogo> jogosTime = todosOsJogosPorTime().get(time);
+        Long vitorias = jogosTime.stream().filter(jogo -> jogo.vencedor().equals(time)).count();
+        Long derrotas = jogosTime.stream().filter(jogo -> !jogo.vencedor().equals(time)).count();
+        Long empates = jogosTime.stream().filter(jogo -> jogo.mandantePlacar().equals(jogo.visitantePlacar())).count();
+        Long saldoGols = totalGolsPositivosTime(time) - totalGolsSofridosTime(time);
+
+        return new PosicaoTabela(time, vitorias, derrotas, empates, totalGolsPositivosTime(time), totalGolsSofridosTime(time), saldoGols);
+    }
+
+    private Long totalGolsPositivosTime(Time time) {
+        List<Jogo> jogosTimeMandante = todosOsJogosPorTimeComoMandantes().get(time);
+        Long golsPositivosMandante = jogosTimeMandante.stream().mapToLong(Jogo::mandantePlacar).sum();
+
+        List<Jogo> jogosTimeVisitante = todosOsJogosPorTimeComoVisitante().get(time);
+        Long golsPositivosVisitante = jogosTimeVisitante.stream().mapToLong(Jogo::visitantePlacar).sum();
+
+        return golsPositivosMandante + golsPositivosVisitante;
+    }
+
+    private Long totalGolsSofridosTime(Time time) {
+        List<Jogo> jogosTimeMandante = todosOsJogosPorTimeComoMandantes().get(time);
+        Long golsSofridosMandante = jogosTimeMandante.stream().mapToLong(Jogo::visitantePlacar).sum();
+
+        List<Jogo> jogosTimeVisitante = todosOsJogosPorTimeComoVisitante().get(time);
+        Long golsSofridosVisitante = jogosTimeVisitante.stream().mapToLong(Jogo::mandantePlacar).sum();
+
+        return golsSofridosMandante + golsSofridosVisitante;
     }
 
 
@@ -212,16 +252,24 @@ public class Brasileirao {
 
     // METODOS EXTRA
 
-    private Map<Integer, Integer> totalGolsPorRodada() {
-        return null;
+    public Map<Integer, Integer> totalGolsPorRodada() {
+        return todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::rodada,
+                        Collectors.summingInt(this::retornarQuantidadeGolsPorJogo)));
     }
 
-    private Map<Time, Integer> totalDeGolsPorTime() {
-        return null;
+    public Map<Time, Integer> totalDeGolsPorTime() {
+        return todosOsTimes().stream()
+                .collect(Collectors.toMap(
+                        time -> time,
+                        time -> (totalGolsPositivosTime(time).intValue()),
+                        (original, novo) -> original));
     }
 
-    private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
+    public Map<Integer, Double> mediaDeGolsPorRodada() {
+        return todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::rodada,
+                        Collectors.averagingDouble(this::retornarQuantidadeGolsPorJogo)));
     }
 
 

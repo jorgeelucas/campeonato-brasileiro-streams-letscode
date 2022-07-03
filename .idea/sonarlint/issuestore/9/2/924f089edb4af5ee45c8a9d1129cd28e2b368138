@@ -1,0 +1,33 @@
+
+a
+java:S1192"FDefine a constant instead of duplicating this literal "alice" 3 times.(”ÃÇûÿÿÿÿ
+0
+java:S1220""Move this file to a named package.
+V
+java:S1854g";Remove this useless assignment to local variable "alunos1".(É¤–ûÿÿÿÿ
+V	java:S125"<This block of commented-out lines of code should be removed.(’ÛÃĞşÿÿÿÿ
+Q	java:S125#"<This block of commented-out lines of code should be removed.(·ÌÄû
+S	java:S106/"9Replace this use of System.out or System.err by a logger.(Áçˆııÿÿÿÿ
+S	java:S1065"9Replace this use of System.out or System.err by a logger.(¹ˆê£ùÿÿÿÿ
+S	java:S106?"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+Q	java:S1259"<This block of commented-out lines of code should be removed.(¢›×
+S	java:S106E"9Replace this use of System.out or System.err by a logger.(í±Âéÿÿÿÿÿ
+N	java:S106F"9Replace this use of System.out or System.err by a logger.(Â•§ğ
+S	java:S106M"9Replace this use of System.out or System.err by a logger.(©¢Êªøÿÿÿÿ
+S	java:S106S"9Replace this use of System.out or System.err by a logger.(É°óËúÿÿÿÿ
+S	java:S106Y"9Replace this use of System.out or System.err by a logger.(™©±’øÿÿÿÿ
+S	java:S106`"9Replace this use of System.out or System.err by a logger.(ŠÆçöÿÿÿÿÿ
+G
+java:S1481g",Remove this unused "alunos1" local variable.(É¤–ûÿÿÿÿ
+S	java:S106i"9Replace this use of System.out or System.err by a logger.(¤¬¥²ıÿÿÿÿ
+N	java:S106k"9Replace this use of System.out or System.err by a logger.(ŸÛ—à
+S	java:S106m"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+N	java:S106s"9Replace this use of System.out or System.err by a logger.(Âûå
+S	java:S106~"9Replace this use of System.out or System.err by a logger.(Ó…ª¸ûÿÿÿÿ
+T	java:S106„"9Replace this use of System.out or System.err by a logger.(ÃíĞÄùÿÿÿÿ
+O
+java:S1128"4Remove this unused import 'java.util.LinkedHashMap'.(ò†ŠŞùÿÿÿÿ
+V
+java:S1128";Remove this unused import 'java.util.function.BiPredicate'.(Ğ–¡ñúÿÿÿÿ
+O
+java:S1128"9Remove this unused import 'java.util.function.Predicate'.(ïÍ–¶

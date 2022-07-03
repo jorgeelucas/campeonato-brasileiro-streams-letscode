@@ -6,21 +6,18 @@ import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,48 +40,87 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+    public Double mediaGolsPorJogo() {
+
+        double contagemJogos = todosOsJogos().stream().count();
+
+        double golsTotais = todosOsJogos().stream().mapToInt(x -> x.mandantePlacar() + x.visitantePlacar()).sum();
+
+        return golsTotais/contagemJogos;
+
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+
+        IntSummaryStatistics statistics = todosOsJogos().stream()
+                .mapToInt(x -> x.visitantePlacar() + x.mandantePlacar())
+                .summaryStatistics();
+
+        return statistics;
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+
+        return this.brasileirao.values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+
+        List<Jogo> jogos = todosOsJogos();
+
+        return jogos.stream().filter(x -> x.estadoMandante().equals(x.estadoVencedor()) && x.mandantePlacar()> x.visitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+
+        return todosOsJogos().stream().filter(x -> x.estadoVisitante().equals(x.estadoVencedor()) && x.visitantePlacar() > x.mandantePlacar()).count();
     }
 
     public Long totalEmpates() {
-        return null;
+
+        return todosOsJogos().stream().filter(x -> (x.mandantePlacar() == x.visitantePlacar())).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+
+        List<Jogo> jogos = todosOsJogos();
+
+        return jogos.stream().filter(x -> (x.mandantePlacar()+ x.visitantePlacar()) < 3).count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+
+        List<Jogo> jogos = todosOsJogos();
+
+        return jogos.stream().filter(x -> (x.mandantePlacar()+ x.visitantePlacar()) >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
+
+        Map<Resultado, Long> todosPlacares = todosOsJogos().stream()
+                .map(x -> new Resultado(x.mandantePlacar(), x.visitantePlacar()))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.mapping(Function.identity(), Collectors.counting())));
+
+        return todosPlacares;
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+
+        Optional<Map.Entry<Resultado, Long>> maxEntry = todosOsPlacares()
+                                                    .entrySet()
+                                                    .stream()
+                                                    .max(Map.Entry.comparingByValue());
+        return maxEntry.get();
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
+
+        Optional<Map.Entry<Resultado, Long>> minEntry = todosOsPlacares()
+                                                    .entrySet()
+                                                    .stream()
+                                                    .min(Map.Entry.comparingByValue());
+
+        return minEntry.get();
     }
 
     private List<Time> todosOsTimes() {
@@ -98,7 +134,11 @@ public class Brasileirao {
                 .map(Jogo::visitante)
                 .toList();
 
-        return null;
+        List<Time> todosTimes = new ArrayList<>();
+        todosTimes.addAll(mandantes);
+        todosTimes.addAll(visitantes);
+
+        return todosTimes;
     }
 
     /**
@@ -106,7 +146,13 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+
+        Map<Time, List<Jogo>> jogosMandante = todosOsJogos().stream()
+                                                .collect(Collectors.groupingBy(
+                                                        Jogo::mandante,
+                                                        Collectors.mapping(Function.identity(), Collectors.toList())));
+
+        return jogosMandante;
     }
 
     /**
@@ -114,33 +160,100 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+
+        Map<Time, List<Jogo>> jogosVisitante = todosOsJogos().stream()
+                                                .collect(Collectors.groupingBy(
+                                                        Jogo::visitante,
+                                                        Collectors.mapping(Function.identity(), Collectors.toList())));
+        return jogosVisitante;
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
-        return null;
+
+//        var m1 = todosOsJogosPorTimeComoMandantes();
+//        var m2 = todosOsJogosPorTimeComoVisitante();
+//
+//         m2.forEach((K, V) -> {
+//            m1.merge(K, V, (list1, list2) -> {
+//                list1.addAll(list2);
+//                return list1;
+//            });
+//        });
+
+        Map<Time, List<Jogo>> todosJogosTime = Stream.of(todosOsJogosPorTimeComoMandantes(), todosOsJogosPorTimeComoVisitante())
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue, (v1,v2) -> {v1.addAll(v2); return v1;} ));
+        System.out.println(todosJogosTime);
+
+        return todosJogosTime;
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
+
+//        Map<Time, List<Jogo>> collect = todosOsJogos().stream()
+//                .collect(Collectors.groupingBy(Jogo::mandante,Collectors.partitioningBy(x -> x.mandante())))
+//
+//        todosOsJogos().stream()
+//                .collect(
+//                        Collectors.partitioningBy(x -> x.mandante().equals(x.))
+
         return null;
     }
 
     public Set<PosicaoTabela> tabela() {
+
+
+//        todosOsJogosPorTime()
+//                .entrySet()
+//                .stream()
+//                .map(x -> new PosicaoTabela(x.getKey(),
+//                                x.getValue().stream().forEach(
+//                                        i -> { if(i.estadoMandante().equals(i.estadoVencedor()) && i.mandantePlacar() > i.visitantePlacar()){
+//                                        }
+//                                        }
+//                    //    x.getValue().stream().collect(Collectors.)))
+
+//        Flamengo, pontos=71, vitorias=21, derrotas=9, empates=8, golsPositivos=68, golsSofridos=48, saldoDeGols=20}
+
         return null;
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+
+        List<Jogo> jogosList = Files.lines(file)
+                .skip(1)
+                .map(line -> line.split(";"))
+                .map(field -> new Jogo(Integer.parseInt(field[0]),
+                        new DataDoJogo(LocalDate.parse(field[1], dateFormatter), LocalTime.parse(field[2].replace("h", ":"), timeFormatter), getDayOfWeek(field[3])),
+                        new Time(field[4]),
+                        new Time(field[5]),
+                        new Time(field[6]),
+                        field[7],
+                        Integer.parseInt(field[8]),
+                        Integer.parseInt(field[9]),
+                        field[10],
+                        field[11],
+                        field[12]))
+                .toList();
+
+
+        return jogosList;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-Feira", DayOfWeek.MONDAY,
+                "Terça-Feira", DayOfWeek.TUESDAY,
+                "Quarta-Feira", DayOfWeek.WEDNESDAY,
+                "Quinta-Feira", DayOfWeek.THURSDAY,
+                "Sexta-Feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }

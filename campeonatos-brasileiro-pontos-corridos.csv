@@ -2193,7 +2193,7 @@ Rodada;Data;Horário;Dia;Mandante;Visitante;Vencedor;Arena;Mandante Placar;Visit
 25;08/09/2007;16h00;Sábado;Vasco;São Paulo;São Paulo;São Januário;0;2;RJ;SP;SP
 25;09/09/2007;19h00;Domingo;América-RN;Sport;-;Machadão;1;1;RN;PE;-
 25;09/09/2007;19h00;Domingo;Fluminense;Athlético-PR;Fluminense;Maracanã;2;0;RJ;PR;RJ
-25;09/09/2007;;Domingo;Náutico;Botafogo-RJ;Náutico;Aflitos;4;1;PE;RJ;PE
+25;09/09/2007;19h00;Domingo;Náutico;Botafogo-RJ;Náutico;Aflitos;4;1;PE;RJ;PE
 25;09/09/2007;19h00;Domingo;Palmeiras;Goiás;Palmeiras;Parque Antártica;2;0;SP;GO;SP
 25;09/09/2007;19h00;Domingo;Paraná;Corinthians;Paraná;Durival de Brito;1;0;PR;SP;PR
 16;12/09/2007;20h30;Quarta-feira;Flamengo;Cruzeiro;Flamengo;Maracanã;3;1;RJ;MG;RJ
@@ -5355,16 +5355,16 @@ Rodada;Data;Horário;Dia;Mandante;Visitante;Vencedor;Arena;Mandante Placar;Visit
 37;29/11/2015;17h00;Domingo;Grêmio;Atlético-MG;Grêmio;Arena do Grêmio;2;1;RS;MG;RS
 37;29/11/2015;17h00;Domingo;Sport;Corinthians;Sport;Arena Pernambuco;2;0;PE;SP;PE
 37;29/11/2015;17h00;Domingo;Vasco;Santos;Vasco;Maracanã;1;0;RJ;SP;RJ
-38;06/12/2015;;Domingo;Corinthians;Avaí;-;Arena Corinthians;1;1;SP;SC;-
-38;06/12/2015;;Domingo;Coritiba;Vasco;-;Couto Pereira;0;0;PR;RJ;-
-38;06/12/2015;;Domingo;Atlético-MG;Chapecoense;Atlético-MG;Independência;3;0;MG;SC;MG
-38;06/12/2015;;Domingo;Figueirense;Fluminense;Figueirense;Orlando Scarpelli;1;0;SC;RJ;SC
-38;06/12/2015;;Domingo;Joinville;Grêmio;Grêmio;Arena Joinville;0;2;SC;RS;RS
-38;06/12/2015;;Domingo;Internacional;Cruzeiro;Internacional;Beira Rio;2;0;RS;MG;RS
-38;06/12/2015;;Domingo;Flamengo;Palmeiras;Palmeiras;Maracanã;1;2;RJ;SP;SP
-38;06/12/2015;;Domingo;Santos;Athlético-PR;Santos;Vila Belmiro;5;1;SP;PR;SP
-38;06/12/2015;;Domingo;Goiás;São Paulo;São Paulo;Serra Dourada;0;1;GO;SP;SP
-38;06/12/2015;;Domingo;Ponte Preta;Sport;Sport;Moisés Lucarelli;0;1;SP;PE;PE
+38;06/12/2015;17h00;Domingo;Corinthians;Avaí;-;Arena Corinthians;1;1;SP;SC;-
+38;06/12/2015;17h00;Domingo;Coritiba;Vasco;-;Couto Pereira;0;0;PR;RJ;-
+38;06/12/2015;17h00;Domingo;Atlético-MG;Chapecoense;Atlético-MG;Independência;3;0;MG;SC;MG
+38;06/12/2015;17h00;Domingo;Figueirense;Fluminense;Figueirense;Orlando Scarpelli;1;0;SC;RJ;SC
+38;06/12/2015;17h00;Domingo;Joinville;Grêmio;Grêmio;Arena Joinville;0;2;SC;RS;RS
+38;06/12/2015;17h00;Domingo;Internacional;Cruzeiro;Internacional;Beira Rio;2;0;RS;MG;RS
+38;06/12/2015;17h00;Domingo;Flamengo;Palmeiras;Palmeiras;Maracanã;1;2;RJ;SP;SP
+38;06/12/2015;17h00;Domingo;Santos;Athlético-PR;Santos;Vila Belmiro;5;1;SP;PR;SP
+38;06/12/2015;17h00;Domingo;Goiás;São Paulo;São Paulo;Serra Dourada;0;1;GO;SP;SP
+38;06/12/2015;17h00;Domingo;Ponte Preta;Sport;Sport;Moisés Lucarelli;0;1;SP;PE;PE
 1;14/05/2016;18:30;Sábado;Atlético-MG;Santos;Atlético-MG;Independência;1;0;MG;SP;MG
 1;14/05/2016;21:00;Sábado;Coritiba;Cruzeiro;Coritiba;Couto Pereira;1;0;PR;MG;PR
 1;14/05/2016;16:00;Sábado;Flamengo;Sport;Flamengo;Raulino de Oliveira;1;0;RJ;PE;RJ

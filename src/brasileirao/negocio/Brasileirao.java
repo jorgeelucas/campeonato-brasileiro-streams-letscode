@@ -185,7 +185,7 @@ public class Brasileirao {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue, (v1,v2) -> {v1.addAll(v2); return v1;} ));
-        System.out.println(todosJogosTime);
+
 
         return todosJogosTime;
     }

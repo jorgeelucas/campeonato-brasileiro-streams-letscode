@@ -29,8 +29,6 @@ public class TestandoBrasileirao {
 
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
-        brasileirao.todosOsJogosPorTime();
-
         imprimirEstatisticas(brasileirao);
 
         imprimirTabela(posicoes);

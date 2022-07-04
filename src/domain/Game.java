@@ -8,6 +8,6 @@ public record Game(Integer round,
                    String site,
                    Integer homeScore,
                    Integer guestScore,
-                   String stateHome,
-                   String stateScore,
-                   String stateWinner){}
+                   String homeState,
+                   String guestState,
+                   String winnerState){}

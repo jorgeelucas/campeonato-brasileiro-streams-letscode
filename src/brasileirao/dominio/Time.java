@@ -3,7 +3,7 @@ package brasileirao.dominio;
 public class Time {
     private final String nome;
 
-    Time(String pNome){
+    public Time(String pNome){
         this.nome = pNome;
     }
 

@@ -9,7 +9,7 @@ public class DataDoJogo {
     private final LocalTime horario;
     private final DayOfWeek dia;
 
-    DataDoJogo (LocalDate pData, LocalTime pHorario, DayOfWeek pDia) {
+    public DataDoJogo(LocalDate pData, LocalTime pHorario, DayOfWeek pDia) {
         this.data = pData;
         this.horario = pHorario;
         this.dia = pDia;

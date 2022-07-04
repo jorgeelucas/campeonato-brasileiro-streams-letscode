@@ -13,17 +13,17 @@ public class Jogo {
     private final String estadoVisitante;
     private final String estadoVencedor;
 
-    Jogo (Integer pRodada,
-          DataDoJogo pData,
-          Time pMandante,
-          Time pVisitante,
-          Time pVencedor,
-          String pArena,
-          Integer pMandantePlacar,
-          Integer pVisitantePlacar,
-          String pEstadoMandante,
-          String pEstadoVisitante,
-          String pEstadoVencedor) {
+    public Jogo(Integer pRodada,
+                DataDoJogo pData,
+                Time pMandante,
+                Time pVisitante,
+                Time pVencedor,
+                String pArena,
+                Integer pMandantePlacar,
+                Integer pVisitantePlacar,
+                String pEstadoMandante,
+                String pEstadoVisitante,
+                String pEstadoVencedor) {
         this.rodada = pRodada;
         this.data = pData;
         this.mandante = pMandante;
@@ -51,5 +51,13 @@ public class Jogo {
 
     public DataDoJogo getData() {
         return this. data;
+    }
+
+    public int getMandantePlacar() {
+        return mandantePlacar;
+    }
+
+    public int getVisitantePlacar() {
+        return visitantePlacar;
     }
 }

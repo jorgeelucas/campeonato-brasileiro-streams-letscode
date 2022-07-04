@@ -1,5 +1,6 @@
 package brasileirao.negocio;
 
+import brasileirao.dominio.DataDoJogo;
 import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
@@ -8,11 +9,16 @@ import brasileirao.dominio.Time;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -23,7 +29,7 @@ public class Brasileirao {
     private final List<Jogo> jogos;
     private final Predicate<Jogo> filtro;
 
-    public Brasileirao(Path arquivo, Predicate<Jogo> filtro) {
+    public Brasileirao(Path arquivo, Predicate<Jogo> filtro) throws IOException {
         this.jogos = lerArquivo(arquivo);
         this.filtro = filtro;
         this.brasileiraoByRound = jogos.stream()
@@ -38,7 +44,12 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        //total de gol, total de jogos, media de gols
+       // total de jogos = this.jogos.size(); /// nao, transformar numa Integerstream e egar o intSumStats
+
+        return this.jogos.stream()
+                         .mapToInt(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar())
+                         .summaryStatistics();
     }
 
     private List<Jogo> todosOsJogos() {
@@ -86,7 +97,7 @@ public class Brasileirao {
                                               .map(Jogo::getVisitante)
                                               .collect(Collectors.toList());
 
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -117,20 +128,57 @@ public class Brasileirao {
         return null;
     }
 
-    private List<Jogo> lerArquivo(Path file) {
-        return null;
+    private List<Jogo> lerArquivo(Path file) throws IOException {
+        List<Jogo> matches = new ArrayList<>();
+
+        try (Scanner scanner = new Scanner(file)) {
+            scanner.nextLine();
+
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+
+                String[] matchData = line.split(";");
+
+                String hourString = matchData[2].replace('h', ':');
+
+                if (hourString.isEmpty()) {
+                    hourString = "00:00";
+                }
+
+                DataDoJogo matchDate = new DataDoJogo(LocalDate.parse(matchData[1], DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        LocalTime.parse(hourString, DateTimeFormatter.ofPattern("HH:mm")),
+                        getDayOfWeek(matchData[3]));
+                // DayOfWeek.valueOf(matchData[3]));
+
+                Jogo match = new Jogo(Integer.valueOf(matchData[0]),  // Integer rodada
+                        matchDate,                      // DataDoJogo data
+                        new Time(matchData[4]),         // Time mandante
+                        new Time(matchData[5]),        // Time visitante
+                        new Time(matchData[6]),        // Time vencedor
+                        matchData[7],                   // String arena
+                        Integer.valueOf(matchData[8]),  // Integer mandante placar
+                        Integer.valueOf(matchData[9]),  // Integer visitante placar
+                        matchData[10],                  // String estado mandante
+                        matchData[11],                  // String estado visitante
+                        matchData[12]);                 // String estado vencedor
+
+                matches.add(match);
+            }
+        }
+
+        return matches;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         Map<String, DayOfWeek> daysOfWeek = new HashMap<>();
 
-        daysOfWeek.put("Segunda-feira", DayOfWeek.SUNDAY);
-        daysOfWeek.put("Terça-feira", DayOfWeek.SUNDAY);
-        daysOfWeek.put("Quarta-feira", DayOfWeek.SUNDAY);
-        daysOfWeek.put("Quinta-feira", DayOfWeek.SUNDAY);
-        daysOfWeek.put("Sexta-feira", DayOfWeek.SUNDAY);
-        daysOfWeek.put("Sábado", DayOfWeek.SUNDAY);
         daysOfWeek.put("Domingo", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Segunda-feira", DayOfWeek.MONDAY);
+        daysOfWeek.put("Terça-feira", DayOfWeek.TUESDAY);
+        daysOfWeek.put("Quarta-feira", DayOfWeek.WEDNESDAY);
+        daysOfWeek.put("Quinta-feira", DayOfWeek.THURSDAY);
+        daysOfWeek.put("Sexta-feira", DayOfWeek.FRIDAY);
+        daysOfWeek.put("Sábado", DayOfWeek.SATURDAY);
 
         return daysOfWeek.get(dia);
     }

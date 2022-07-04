@@ -261,15 +261,40 @@ public class Brasileirao {
     // METODOS EXTRA
 
     private Map<Integer, Integer> totalGolsPorRodada() {
-        return null;
+
+        Map<Integer, Integer> golsPorRodada = todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::rodada, Collectors.summingInt(x -> x.visitantePlacar() + x.mandantePlacar())));
+
+
+        return golsPorRodada;
     }
 
     private Map<Time, Integer> totalDeGolsPorTime() {
-        return null;
+
+
+        Map<Time, Integer> golsPorTimeMandante = todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::mandante, Collectors.summingInt(x -> x.mandantePlacar())));
+
+        Map<Time, Integer> golsTimeVencedor = todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::visitante, Collectors.summingInt(x -> x.visitantePlacar())));
+
+
+        Map<Time, Integer> golsTotaisPorTime = Stream.of(golsPorTimeMandante, golsTimeVencedor)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue, (v1, v2) -> v1 + v2));
+
+        return golsTotaisPorTime;
     }
 
     private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
+
+
+        Map<Integer, Double> mediaGols = todosOsJogos().stream()
+                .collect(Collectors.groupingBy(Jogo::rodada, Collectors.averagingDouble(x -> x.visitantePlacar() + x.mandantePlacar())));
+
+        return mediaGols;
     }
 
 

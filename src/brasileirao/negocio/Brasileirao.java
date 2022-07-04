@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -59,23 +58,23 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() > jogo.getVisitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return this.jogos.stream().filter(jogo -> jogo.getVisitantePlacar() > jogo.getMandantePlacar()).count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return this.jogos.stream().filter(jogo -> jogo.getVisitantePlacar() == jogo.getMandantePlacar()).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() < 3).count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
@@ -91,7 +90,6 @@ public class Brasileirao {
 
          return resultsByNumberOfOccurrences.entrySet().stream().max(Map.Entry.comparingByValue()).get();
 
-//                                  .
 //                entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).orElse(emptyEntry);
 
 //                          entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).
@@ -173,16 +171,16 @@ public class Brasileirao {
                 // DayOfWeek.valueOf(matchData[3]));
 
                 Jogo match = new Jogo(Integer.valueOf(matchData[0]),  // Integer rodada
-                        matchDate,                      // DataDoJogo data
-                        new Time(matchData[4]),         // Time mandante
-                        new Time(matchData[5]),        // Time visitante
-                        new Time(matchData[6]),        // Time vencedor
-                        matchData[7],                   // String arena
-                        Integer.valueOf(matchData[8]),  // Integer mandante placar
-                        Integer.valueOf(matchData[9]),  // Integer visitante placar
-                        matchData[10],                  // String estado mandante
-                        matchData[11],                  // String estado visitante
-                        matchData[12]);                 // String estado vencedor
+                                      matchDate,                      // DataDoJogo data
+                                      new Time(matchData[4]),         // Time mandante
+                                      new Time(matchData[5]),         // Time visitante
+                                      new Time(matchData[6]),         // Time vencedor
+                                      matchData[7],                   // String arena
+                                      Integer.valueOf(matchData[8]),  // Integer mandante placar
+                                      Integer.valueOf(matchData[9]),  // Integer visitante placar
+                                      matchData[10],                  // String estado mandante
+                                      matchData[11],                  // String estado visitante
+                                      matchData[12]);                 // String estado vencedor
 
                 matches.add(match);
             }

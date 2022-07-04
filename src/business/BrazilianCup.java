@@ -40,7 +40,7 @@ public class BrazilianCup {
     }
 
     public List<Game> totalGames() {
-        return null;
+        return games.stream().filter(filter).toList();
     }
 
     public Long totalWinsAtHome() {

@@ -1,6 +1,6 @@
 # campeonato-brasileiro-streams-letscode
 
-A ideia desse exercicio é implementar os métodos necessários na classe **TestandoBrasileirao.java** para poder gerar os arquivos necessários
+A ideia desse exercicio é implementar os métodos necessários na classe **BrazilianCupTest.java** para poder gerar os arquivos necessários
 
 Um exemplo de resposta seria:
 

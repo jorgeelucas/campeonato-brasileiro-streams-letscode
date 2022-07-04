@@ -39,7 +39,7 @@ Estatisticas (Empates) - 108
 20. Botafogo-RJ, pontos=27, vitorias=5, derrotas=21, empates=12, golsPositivos=32, golsSofridos=62, saldoDeGols=-30}
 ```
 
-Essa tabela foi gerada com o filtro de 2020/21 que foi a temporada 2020 do campeonato basileiro.
+Essa tabela foi gerada com o filtro do ano: 2020.
 
 
 Fonte de dados: https://github.com/adaoduque/Brasileirao_Dataset

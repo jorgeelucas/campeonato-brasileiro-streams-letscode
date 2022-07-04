@@ -16,7 +16,7 @@ public class TestandoBrasileirao {
 
     public static void main(String[] args) throws IOException {
 
-        Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
+        Path file = Path.of("C:\\Users\\sther\\Documents\\LetsCode\\LetsCode-JAVA\\modulo03-tecnicasProgramacao1\\campeonatoBrasileiro\\campeonato-brasileiro-streams-letscode\\campeonatos-brasileiro-pontos-corridos.csv");
 
 //        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
 //        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
@@ -29,7 +29,7 @@ public class TestandoBrasileirao {
 
         imprimirEstatisticas(brasileirao);
 
-        imprimirTabela(posicoes);
+//        imprimirTabela(posicoes);
 
     }
 
@@ -64,6 +64,7 @@ public class TestandoBrasileirao {
         System.out.println("Estatisticas (Vitorias Em casa) - " + totalVitoriasEmCasa);
         System.out.println("Estatisticas (Empates) - " + empates);
     }
+
 
     public static void imprimirTabela(Set<PosicaoTabela> posicoes) {
         System.out.println();

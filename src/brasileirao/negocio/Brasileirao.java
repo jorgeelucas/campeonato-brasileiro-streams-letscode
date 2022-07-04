@@ -1,46 +1,36 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.DataDoJogo;
 import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Brasileirao {
+    private final Map<Integer, List<Jogo>> brasileiraoByRound;
+    private final List<Jogo> jogos;
+    private final Predicate<Jogo> filtro;
 
-    private Map<Integer, List<Jogo>> brasileirao;
-    private List<Jogo> jogos;
-    private Predicate<Jogo> filtro;
-
-    public Brasileirao(Path arquivo, Predicate<Jogo> filtro) throws IOException {
+    public Brasileirao(Path arquivo, Predicate<Jogo> filtro) {
         this.jogos = lerArquivo(arquivo);
         this.filtro = filtro;
-        this.brasileirao = jogos.stream()
-                .filter(filtro) //filtrar por ano
-                .collect(Collectors.groupingBy(
-                        Jogo::rodada,
-                        Collectors.mapping(Function.identity(), Collectors.toList())));
-
+        this.brasileiraoByRound = jogos.stream()
+                                       .filter(filtro) //filtrar por ano
+                                       .collect(Collectors.groupingBy(Jogo::getRodada,
+                                                                      Collectors.mapping(Function.identity(),
+                                                                                         Collectors.toList())));
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
@@ -51,7 +41,7 @@ public class Brasileirao {
         return null;
     }
 
-    public List<Jogo> todosOsJogos() {
+    private List<Jogo> todosOsJogos() {
         return null;
     }
 
@@ -88,15 +78,13 @@ public class Brasileirao {
     }
 
     private List<Time> todosOsTimes() {
-        List<Time> mandantes = todosOsJogos()
-                .stream()
-                .map(Jogo::mandante)
-                .toList();
+        List<Time> mandantes = todosOsJogos().stream()
+                                             .map(Jogo::getMandante)
+                                             .collect(Collectors.toList());
 
-        List<Time> visitantes = todosOsJogos()
-                .stream()
-                .map(Jogo::visitante)
-                .toList();
+        List<Time> visitantes = todosOsJogos().stream()
+                                              .map(Jogo::getVisitante)
+                                              .collect(Collectors.toList());
 
         return null;
     }
@@ -129,26 +117,28 @@ public class Brasileirao {
         return null;
     }
 
-    public List<Jogo> lerArquivo(Path file) throws IOException {
+    private List<Jogo> lerArquivo(Path file) {
         return null;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
-        return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
-                "Domingo", DayOfWeek.SUNDAY
-        ).get(dia);
+        Map<String, DayOfWeek> daysOfWeek = new HashMap<>();
+
+        daysOfWeek.put("Segunda-feira", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Terça-feira", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Quarta-feira", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Quinta-feira", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Sexta-feira", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Sábado", DayOfWeek.SUNDAY);
+        daysOfWeek.put("Domingo", DayOfWeek.SUNDAY);
+
+        return daysOfWeek.get(dia);
     }
 
     // METODOS EXTRA
 
     private Map<Integer, Integer> totalGolsPorRodada() {
-        return null;
+        return Collections.emptyMap();
     }
 
     private Map<Time, Integer> totalDeGolsPorTime() {
@@ -156,7 +146,7 @@ public class Brasileirao {
     }
 
     private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
+        return Collections.emptyMap();
     }
 
 

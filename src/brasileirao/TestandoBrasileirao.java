@@ -7,20 +7,19 @@ import brasileirao.negocio.Brasileirao;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.IntSummaryStatistics;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
 public class TestandoBrasileirao {
-
     public static void main(String[] args) throws IOException {
-
-        Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
+        Path file = Paths.get("campeonatos-brasileiro-pontos-corridos.csv");
 
 //        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
 //        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
+        Predicate<Jogo> filtro = jogo -> jogo.getData().getData().getYear() == 2014;
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
@@ -30,7 +29,6 @@ public class TestandoBrasileirao {
         imprimirEstatisticas(brasileirao);
 
         imprimirTabela(posicoes);
-
     }
 
     private static void imprimirEstatisticas(Brasileirao brasileirao) {
@@ -42,13 +40,13 @@ public class TestandoBrasileirao {
 
         Map.Entry<Resultado, Long> placarMaisRepetido = brasileirao.placarMaisRepetido();
 
-        System.out.println("Estatisticas (Placar mais repetido) - "
-                + placarMaisRepetido.getKey() + " (" +placarMaisRepetido.getValue() + " jogo(s))");
+        System.out.println("Estatisticas (Placar mais repetido) - " + placarMaisRepetido.getKey() +
+                           " (" +placarMaisRepetido.getValue() + " jogo(s))");
 
         Map.Entry<Resultado, Long> placarMenosRepetido = brasileirao.placarMenosRepetido();
 
-        System.out.println("Estatisticas (Placar menos repetido) - "
-                + placarMenosRepetido.getKey() + " (" +placarMenosRepetido.getValue() + " jogo(s))");
+        System.out.println("Estatisticas (Placar menos repetido) - " + placarMenosRepetido.getKey() +
+                           " (" +placarMenosRepetido.getValue() + " jogo(s))");
 
         Long jogosCom3OuMaisGols = brasileirao.totalJogosCom3OuMaisGols();
         Long jogosComMenosDe3Gols = brasileirao.totalJogosComMenosDe3Gols();
@@ -65,12 +63,15 @@ public class TestandoBrasileirao {
         System.out.println("Estatisticas (Empates) - " + empates);
     }
 
-    public static void imprimirTabela(Set<PosicaoTabela> posicoes) {
+    private static void imprimirTabela(Set<PosicaoTabela> posicoes) {
         System.out.println();
         System.out.println("## TABELA CAMPEONADO BRASILEIRO: ##");
+
         int colocacao = 1;
+
         for (PosicaoTabela posicao : posicoes) {
             System.out.println(colocacao +". " + posicao);
+
             colocacao++;
         }
 

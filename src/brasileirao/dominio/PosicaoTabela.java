@@ -1,13 +1,26 @@
 package brasileirao.dominio;
 
-public record PosicaoTabela(Time time,
-                     Long vitorias,
-                     Long derrotas,
-                     Long empates,
-                     Long golsPositivos,
-                     Long golsSofridos,
-                     Long saldoDeGols) {
-    public Long getPontuacaoTotal() {
+public class PosicaoTabela {
+    private final Time time;
+    private final Long vitorias;
+    private final Long derrotas;
+    private final Long empates;
+    private final Long golsPositivos;
+    private final Long golsSofridos;
+    private final Long saldoDeGols;
+
+    PosicaoTabela(Time pTime, Long pVitorias, Long pDerrotas, Long pEmpates,
+                  Long pGolsPositivos, Long pGolsSofridos, Long pSaldoDeGols) {
+        this.time = pTime;
+        this.vitorias = pVitorias;
+        this.derrotas = pDerrotas;
+        this.empates = pEmpates;
+        this.golsPositivos = pGolsPositivos;
+        this.golsSofridos = pGolsSofridos;
+        this.saldoDeGols = pSaldoDeGols;
+    }
+
+    private Long getPontuacaoTotal() {
         return (vitorias * 3) + empates;
     }
 

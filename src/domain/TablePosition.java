@@ -14,13 +14,12 @@ public record TablePosition(Team team,
     @Override
     public String toString() {
         return  team +
-                ", Pontos =" + getTotalScore() +
-                ", Vitórias =" + victories +
-                ", Derrotas =" + defeats +
-                ", Empates =" + draws +
-                ", Gols Positivos =" + goalsPositive +
-                ", Gols Sofridos =" + goalsSuffered +
-                ", Saldo De Gols =" + balanceOfGoals +
-                '}';
+                ", Pontos = " + getTotalScore() +
+                ", Vitórias = " + victories +
+                ", Derrotas = " + defeats +
+                ", Empates = " + draws +
+                ", Gols Positivos = " + goalsPositive +
+                ", Gols Sofridos = " + goalsSuffered +
+                ", Saldo De Gols = " + balanceOfGoals;
     }
 }

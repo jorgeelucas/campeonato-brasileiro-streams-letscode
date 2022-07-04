@@ -12,8 +12,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -81,12 +83,32 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+        Map.Entry<Resultado, Long> emptyEntry = new AbstractMap.SimpleEntry<>(new Resultado(0, 0), 0L);
+
+         Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
+                                       map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
+                                       collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+         return resultsByNumberOfOccurrences.entrySet().stream().max(Map.Entry.comparingByValue()).get();
+
+//                                  .
+//                entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).orElse(emptyEntry);
+
+//                          entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).
+//                          orElse(  emptyEntry  )   ;
+//                                  ,  Collectors.summingLong());
+//                          sorted().
+//                          findFirst();
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
-    }
+        Map.Entry<Resultado, Long> emptyEntry = new AbstractMap.SimpleEntry<>(new Resultado(0, 0), 0L);
+
+        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
+                map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
+                collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        return resultsByNumberOfOccurrences.entrySet().stream().max((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())).get();    }
 
     private List<Time> todosOsTimes() {
         List<Time> mandantes = todosOsJogos().stream()
@@ -125,7 +147,7 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
-        return null;
+        return null; //talvez seja um groupingby nome do time, somando as coisas
     }
 
     private List<Jogo> lerArquivo(Path file) throws IOException {
@@ -196,6 +218,4 @@ public class Brasileirao {
     private Map<Integer, Double> mediaDeGolsPorRodada() {
         return Collections.emptyMap();
     }
-
-
 }

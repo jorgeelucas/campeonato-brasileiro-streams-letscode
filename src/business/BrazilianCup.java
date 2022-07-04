@@ -21,15 +21,18 @@ public class BrazilianCup {
         this.games = readFile(file);
         this.filter = filter;
         this.brazilianCup = games.stream()
-                .filter((Predicate<? super Game>) games) //filtrar por ano
+                .filter((Predicate<? super Game>) games)
                 .collect(Collectors.groupingBy(
                         Game::round,
                         Collectors.mapping(Function.identity(), Collectors.toList())));
 
     }
 
-    public Map<Game, Integer> averageGoalsPerGame() {
-        return null;
+    public Map<Game, Double> averageGoalsPerGame() {
+        return totalGames().stream().collect(Collectors.groupingBy(
+                Function.identity(),
+                Collectors.averagingInt(game -> game.homeScore() + game.guestScore())
+        ));
     }
 
     public IntSummaryStatistics statsPerGame() {

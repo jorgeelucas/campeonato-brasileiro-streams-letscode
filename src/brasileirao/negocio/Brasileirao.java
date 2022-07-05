@@ -37,12 +37,21 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+    public Map<Jogo, Double> mediaGolsPorJogo() {
+
+        return todosOsJogos()
+                .stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.averagingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+
+        return todosOsJogos()
+                .stream()
+                .filter(filtro)
+                .collect(Collectors.summarizingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()))
+                ;
     }
 
     public List<Jogo> todosOsJogos() {
@@ -50,14 +59,25 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+
+        return jogos
+                .stream()
+                .filter(filtro)
+                .filter(jogo -> jogo.mandantePlacar() > jogo.visitantePlacar())
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+
+        return jogos
+                .stream()
+                .filter(filtro)
+                .filter(jogo -> jogo.visitantePlacar() > jogo.mandantePlacar())
+                .count();
     }
 
     public Long totalEmpates() {
+
         return jogos
                 .stream()
                 .filter(filtro)
@@ -87,6 +107,7 @@ public class Brasileirao {
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
+
         return jogos
                 .stream()
                 .filter(filtro)
@@ -95,6 +116,7 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
+
         Map<Resultado, Long> todosPlacares = todosOsPlacares();
 
         Optional <Map.Entry<Resultado, Long>> placarMaisRepetido = todosPlacares
@@ -107,6 +129,7 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
+
         Map<Resultado, Long> todosPlacares = todosOsPlacares();
 
         Optional <Map.Entry<Resultado, Long>> placarMenosRepetido = todosPlacares
@@ -146,12 +169,12 @@ public class Brasileirao {
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
 
-        Map<Time, List<Jogo>> todosJogos = todosOsJogosPorTimeComoVisitante();
+        Map<Time, List<Jogo>> todosJogosPorTime = todosOsJogosPorTimeComoVisitante();
         Map<Time, List<Jogo>> jogosMandante = todosOsJogosPorTimeComoMandantes();
 
-        todosJogos.putAll(jogosMandante);
+        todosJogosPorTime.putAll(jogosMandante);
 
-        return todosJogos;
+        return todosJogosPorTime;
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
@@ -170,18 +193,19 @@ public class Brasileirao {
                 .skip(1)
                 .map(linha -> linha.split(";"))
                 .map(dados -> new Jogo(Integer.parseInt(dados[0]),
-                        new DataDoJogo(LocalDate.parse(dados[1], formatoData),
-                                       LocalTime.parse(dados[2].isBlank()? "12:00" : dados[2].replace("h", ":")),
-                                       getDayOfWeek(dados[3])),
-                        new Time(dados[4]),
-                        new Time(dados[5]),
-                        new Time(dados[6]),
-                        dados[7],
-                        Integer.parseInt(dados[8]),
-                        Integer.parseInt(dados[9]),
-                        dados[10],
-                        dados[11],
-                        dados[12])).toList();
+                              new DataDoJogo(LocalDate.parse(dados[1], formatoData),
+                              LocalTime.parse(dados[2].isBlank() ? "12:00" : dados[2].replace("h", ":")),
+                              getDayOfWeek(dados[3])),
+                new Time(dados[4]),
+                new Time(dados[5]),
+                new Time(dados[6]),
+                dados[7],
+                Integer.parseInt(dados[8]),
+                Integer.parseInt(dados[9]),
+                dados[10],
+                dados[11],
+                dados[12]))
+                .toList();
 
     }
 
@@ -211,10 +235,13 @@ public class Brasileirao {
     private Map<Time, Integer> totalDeGolsPorTime() {
         return null;
     }
-
+*/
     private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return null;
-    }*/
+        return todosOsJogos()
+                .stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(Jogo::rodada, Collectors.averagingDouble(jogo -> jogo.visitantePlacar() + jogo.mandantePlacar())));
+    }
 
 
 }

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.IntSummaryStatistics;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class TestandoBrasileirao {
 
@@ -19,16 +20,16 @@ public class TestandoBrasileirao {
 
 //        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
 //        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-//        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
+          Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
-/*        Brasileirao brasileirao = new Brasileirao(file, filtro);
+      Brasileirao brasileirao = new Brasileirao(file, filtro);
 
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
         imprimirEstatisticas(brasileirao);
 
-        imprimirTabela(posicoes);*/
+        imprimirTabela(posicoes);
 
     }
 
@@ -37,7 +38,7 @@ public class TestandoBrasileirao {
 
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());
         System.out.println("Estatisticas (Total de jogos) - " + statistics.getCount());
-        System.out.println("Estatisticas (Media de gols) - " + statistics.getAverage());
+        System.out.printf("Estatisticas (Media de gols) - %.2f %n", statistics.getAverage());
 
         Map.Entry<Resultado, Long> placarMaisRepetido = brasileirao.placarMaisRepetido();
 

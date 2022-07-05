@@ -21,5 +21,6 @@ public class testemain {
         System.out.println(brasileirao.placarMenosRepetido());
         System.out.println(brasileirao.todosOsPlacares());
         System.out.println(brasileirao.todosOsJogosPorTime());
+        //System.out.println(brasileirao.mediaDeGolsPorRodada());
     }
 }

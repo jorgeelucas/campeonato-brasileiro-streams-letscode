@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.IntSummaryStatistics;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class TestandoBrasileirao {
 
@@ -20,16 +19,16 @@ public class TestandoBrasileirao {
 
 //        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
 //        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
+//        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
-        Brasileirao brasileirao = new Brasileirao(file, filtro);
+/*        Brasileirao brasileirao = new Brasileirao(file, filtro);
 
         Set<PosicaoTabela> posicoes = brasileirao.tabela();
 
         imprimirEstatisticas(brasileirao);
 
-        imprimirTabela(posicoes);
+        imprimirTabela(posicoes);*/
 
     }
 

@@ -6,6 +6,7 @@ import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,13 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,7 +35,6 @@ public class Brasileirao {
                 .collect(Collectors.groupingBy(
                         Jogo::rodada,
                         Collectors.mapping(Function.identity(), Collectors.toList())));
-
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
@@ -48,7 +42,10 @@ public class Brasileirao {
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return this.jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.summarizingInt(jogo->jogo.visitantePlacar()+jogo.mandantePlacar()));
+        //return null;
     }
 
     public List<Jogo> todosOsJogos() {
@@ -130,7 +127,63 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+        try (Stream<String> linhas = Files.lines(file)) {
+            return linhas
+                    .skip(1)
+                    .map(linha ->{
+                        String[] conteudoLinha = linha.split(";");
+                        String stringRodada = conteudoLinha[0];
+                        String stringData = conteudoLinha[1];
+                        String stringHorario = conteudoLinha[2].replace("h",":");
+                        DayOfWeek dia = getDayOfWeek(conteudoLinha[3]);
+                        String stringMandante = conteudoLinha[4];
+                        String stringVisitante = conteudoLinha[5];
+                        String stringVencedor = conteudoLinha[6];
+                        String stringArena = conteudoLinha[7];
+                        String stringMandantePlacar = conteudoLinha[8];
+                        String stringVisitantePlacar = conteudoLinha[9];
+                        String stringEstadoMandante = conteudoLinha[10];
+                        String stringEstadoVisitante = conteudoLinha[11];
+                        String stringEstadoVencedor = conteudoLinha[12];
+
+                        Integer rodada = Integer.valueOf(stringRodada);
+
+                        DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        DateTimeFormatter formatterHorario = DateTimeFormatter.ofPattern("HH:mm");
+
+                        LocalDate data = LocalDate.parse(stringData,formatterData);
+                        LocalTime horario = null;
+                        try {
+                            LocalTime.parse(stringHorario, formatterHorario);
+                        }catch(DateTimeParseException e){
+                            horario = LocalTime.of(16, 00);
+                        }
+
+                        DataDoJogo dataDoJogo = new DataDoJogo(
+                                data,
+                                horario,
+                                dia
+                        );
+
+                        Time mandante = new Time(stringMandante);
+                        Time visitante = new Time(stringVisitante);
+                        Time vencedor= new Time(stringVencedor);
+
+                        String arena = stringArena;
+                        Integer mandantePlacar = Integer.parseInt(stringMandantePlacar);
+                        Integer visitantePlacar = Integer.parseInt(stringVisitantePlacar);
+                        String estadoMandante = stringEstadoMandante;
+                        String estadoVisitante = stringEstadoVisitante;
+                        String estadoVencedor = stringEstadoVencedor;
+
+                        Jogo jogo = new Jogo(rodada,dataDoJogo,mandante,visitante,vencedor,arena,mandantePlacar,visitantePlacar,estadoMandante,estadoVisitante,estadoVencedor);
+                        return jogo;
+                    })
+                    .toList();
+        }
+        catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     private DayOfWeek getDayOfWeek(String dia) {

@@ -1,6 +1,6 @@
 package brasileirao.dominio;
 
-public record PosicaoTabela(Time time,
+public record  PosicaoTabela(Time time,
                      Long vitorias,
                      Long derrotas,
                      Long empates,

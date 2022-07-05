@@ -9,3 +9,5 @@ F
 src/modelo/Genero.java,4\a\4a5edc3fedb8564e08d6159ed0b29fbf3fe4936b
 W
 'src/brasileirao/dominio/DataDoJogo.java,0\0\0003c3544ce5169c5e03535e11fcc6db208026b8
+V
+&src/brasileirao/dominio/Resultado.java,e\c\ec8ce91a3eb779271f45adfb5e56143c573dd011

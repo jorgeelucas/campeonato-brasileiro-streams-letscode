@@ -46,7 +46,7 @@ public class Brasileirao {
 
         double golsTotais = todosOsJogos().stream().mapToInt(x -> x.mandantePlacar() + x.visitantePlacar()).sum();
 
-        return golsTotais/contagemJogos;
+        return golsTotais / contagemJogos;
 
     }
 
@@ -68,7 +68,7 @@ public class Brasileirao {
 
         List<Jogo> jogos = todosOsJogos();
 
-        return jogos.stream().filter(x -> x.estadoMandante().equals(x.estadoVencedor()) && x.mandantePlacar()> x.visitantePlacar()).count();
+        return jogos.stream().filter(x -> x.estadoMandante().equals(x.estadoVencedor()) && x.mandantePlacar() > x.visitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
@@ -85,14 +85,14 @@ public class Brasileirao {
 
         List<Jogo> jogos = todosOsJogos();
 
-        return jogos.stream().filter(x -> (x.mandantePlacar()+ x.visitantePlacar()) < 3).count();
+        return jogos.stream().filter(x -> (x.mandantePlacar() + x.visitantePlacar()) < 3).count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
 
         List<Jogo> jogos = todosOsJogos();
 
-        return jogos.stream().filter(x -> (x.mandantePlacar()+ x.visitantePlacar()) >= 3).count();
+        return jogos.stream().filter(x -> (x.mandantePlacar() + x.visitantePlacar()) >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
@@ -107,18 +107,18 @@ public class Brasileirao {
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
 
         Optional<Map.Entry<Resultado, Long>> maxEntry = todosOsPlacares()
-                                                    .entrySet()
-                                                    .stream()
-                                                    .max(Map.Entry.comparingByValue());
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue());
         return maxEntry.get();
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
 
         Optional<Map.Entry<Resultado, Long>> minEntry = todosOsPlacares()
-                                                    .entrySet()
-                                                    .stream()
-                                                    .min(Map.Entry.comparingByValue());
+                .entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue());
 
         return minEntry.get();
     }
@@ -143,33 +143,36 @@ public class Brasileirao {
 
     /**
      * todos os jogos que cada time foi mandante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
 
         Map<Time, List<Jogo>> jogosMandante = todosOsJogos().stream()
-                                                .collect(Collectors.groupingBy(
-                                                        Jogo::mandante,
-                                                        Collectors.mapping(Function.identity(), Collectors.toList())));
+                .collect(Collectors.groupingBy(
+                        Jogo::mandante,
+                        Collectors.mapping(Function.identity(), Collectors.toList()))); //não precisava disso, podia parar no Jogo::mandante
 
         return jogosMandante;
     }
 
     /**
      * todos os jogos que cada time foi visitante
-     * @return Map<Time, List<Jogo>>
+     *
+     * @return Map<Time, List < Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
 
         Map<Time, List<Jogo>> jogosVisitante = todosOsJogos().stream()
-                                                .collect(Collectors.groupingBy(
-                                                        Jogo::visitante,
-                                                        Collectors.mapping(Function.identity(), Collectors.toList())));
+                .collect(Collectors.groupingBy(
+                        Jogo::visitante,
+                        Collectors.mapping(Function.identity(), Collectors.toList()))); //não precisava disso, podia parar no Jogo::visitante
         return jogosVisitante;
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
 
+        //usando merge
 //        var m1 = todosOsJogosPorTimeComoMandantes();
 //        var m2 = todosOsJogosPorTimeComoVisitante();
 //
@@ -184,22 +187,30 @@ public class Brasileirao {
                 .flatMap(map -> map.entrySet().stream())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        Map.Entry::getValue, (v1,v2) -> {v1.addAll(v2); return v1;} ));
-
+                        Map.Entry::getValue, (v1, v2) -> {
+                            v1.addAll(v2);
+                            return v1;
+                        }));
 
         return todosJogosTime;
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
 
-//        Map<Time, List<Jogo>> collect = todosOsJogos().stream()
-//                .collect(Collectors.groupingBy(Jogo::mandante,Collectors.partitioningBy(x -> x.mandante())))
-//
-//        todosOsJogos().stream()
-//                .collect(
-//                        Collectors.partitioningBy(x -> x.mandante().equals(x.))
 
-        return null;
+        Map<Time, Map<Boolean, List<Jogo>>> jogosParticionados =
+                todosOsJogosPorTime()
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                map -> map.getValue().stream()
+                                        .collect(Collectors.groupingBy(jogo -> jogo.mandante().nome().equals(map.getKey().nome())))
+                                )
+                        );
+
+
+        return jogosParticionados;
     }
 
     public Set<PosicaoTabela> tabela() {
@@ -229,17 +240,21 @@ public class Brasileirao {
         List<Jogo> jogosList = Files.lines(file)
                 .skip(1)
                 .map(line -> line.split(";"))
-                .map(field -> new Jogo(Integer.parseInt(field[0]),
-                        new DataDoJogo(LocalDate.parse(field[1], dateFormatter), LocalTime.parse(field[2].replace("h", ":"), timeFormatter), getDayOfWeek(field[3])),
-                        new Time(field[4]),
-                        new Time(field[5]),
-                        new Time(field[6]),
-                        field[7],
-                        Integer.parseInt(field[8]),
-                        Integer.parseInt(field[9]),
-                        field[10],
-                        field[11],
-                        field[12]))
+                .map(field -> new Jogo(
+                                        Integer.parseInt(field[0]),
+                                        new DataDoJogo(
+                                                LocalDate.parse(field[1], dateFormatter),
+                                                LocalTime.parse(field[2].replace("h", ":"), timeFormatter),
+                                                getDayOfWeek(field[3])),
+                                        new Time(field[4]),
+                                        new Time(field[5]),
+                                        new Time(field[6]),
+                                        field[7],
+                                        Integer.parseInt(field[8]),
+                                        Integer.parseInt(field[9]),
+                                        field[10],
+                                        field[11],
+                                        field[12]))
                 .toList();
 
 
@@ -296,6 +311,4 @@ public class Brasileirao {
 
         return mediaGols;
     }
-
-
 }

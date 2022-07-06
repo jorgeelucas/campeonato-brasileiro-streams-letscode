@@ -6,6 +6,9 @@ import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,11 +47,19 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.toMap(
+                        jogo -> jogo,
+                        jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()
+                ));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return mediaGolsPorJogo().values()
+                .stream()
+                .mapToInt(gols -> gols)
+                .summaryStatistics();
     }
 
     public List<Jogo> todosOsJogos() {
@@ -130,17 +141,46 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+        List<Jogo> partidas;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.toFile()))) {
+            partidas = bufferedReader.lines()
+                    .skip(1)
+                    .map(linha -> {
+                        String[] linhaSplited = linha.split(";");
+                        Integer rodada = Integer.valueOf(linhaSplited[0]);
+                        LocalDate data = LocalDate.parse(linhaSplited[1], DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        String hora = linhaSplited[2].replace("h", ":");
+                        LocalTime horario = null;
+                        try {
+                            horario = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
+                        }catch (DateTimeParseException e){
+                            horario = LocalTime.of(16, 0);
+                        }
+                        DayOfWeek dia = getDayOfWeek(linhaSplited[3]);
+                        DataDoJogo dataDoJogo = new DataDoJogo(data, horario, dia);
+                        Time mandante = new Time(linhaSplited[4]);
+                        Time visitante = new Time(linhaSplited[5]);
+                        Time vencedor = new Time(linhaSplited[6]);
+                        String arena = linhaSplited[7];
+                        Integer mandantePlacar = Integer.valueOf(linhaSplited[8]);
+                        Integer visitantePlacar = Integer.valueOf(linhaSplited[9]);
+                        String estadoMandante = linhaSplited[10];
+                        String estadoVisitante = linhaSplited[11];
+                        String estadoVencedor = linhaSplited[12];
+                        return new Jogo(rodada, dataDoJogo, mandante, visitante, vencedor, arena, mandantePlacar, visitantePlacar, estadoMandante, estadoVisitante, estadoVencedor);
+                    }).toList();
+        }
+        return partidas;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
         return Map.of(
-                "Segunda-feira", DayOfWeek.SUNDAY,
-                "Terça-feira", DayOfWeek.SUNDAY,
-                "Quarta-feira", DayOfWeek.SUNDAY,
-                "Quinta-feira", DayOfWeek.SUNDAY,
-                "Sexta-feira", DayOfWeek.SUNDAY,
-                "Sábado", DayOfWeek.SUNDAY,
+                "Segunda-feira", DayOfWeek.MONDAY,
+                "Terça-feira", DayOfWeek.TUESDAY,
+                "Quarta-feira", DayOfWeek.WEDNESDAY,
+                "Quinta-feira", DayOfWeek.THURSDAY,
+                "Sexta-feira", DayOfWeek.FRIDAY,
+                "Sábado", DayOfWeek.SATURDAY,
                 "Domingo", DayOfWeek.SUNDAY
         ).get(dia);
     }

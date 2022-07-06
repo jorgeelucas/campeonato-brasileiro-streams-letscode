@@ -241,8 +241,34 @@ public class Brasileirao {
                                                        Integer::sum));
     }
 
-    private Map<Time, Integer> totalDeGolsPorTime() {
-        return null;
+    public Map<Time, Integer> totalDeGolsPorTime() {
+        Map<Time, Integer> numberOfGoalsPerHomeTeam =
+                                      todosOsJogosPorTimeComoMandantes().
+                                      entrySet().
+                                      stream().
+                                      collect(Collectors.
+                                              toMap(Entry::getKey,
+                                                    entry -> entry.getValue().
+                                                                   stream().
+                                                                   mapToInt(Jogo::getMandantePlacar).
+                                                                   sum()));
+
+        Map<Time, Integer> numberOfGoalsPerVisitingTeam =
+                                      todosOsJogosPorTimeComoVisitante().
+                                      entrySet().
+                                      stream().
+                                      collect(Collectors.
+                                              toMap(Entry::getKey,
+                                                    entry -> entry.getValue().
+                                                                   stream().
+                                                                   mapToInt(Jogo::getVisitantePlacar).
+                                                                   sum()));
+
+        return Stream.of(numberOfGoalsPerHomeTeam, numberOfGoalsPerVisitingTeam).flatMap(map -> map.entrySet().stream()).
+                                                                                        collect(Collectors.
+                                                                                        toMap(Entry::getKey,
+                                                                                              Entry::getValue,
+                                                                                              Integer::sum));
     }
 
     private Map<Integer, Double> mediaDeGolsPorRodada() {

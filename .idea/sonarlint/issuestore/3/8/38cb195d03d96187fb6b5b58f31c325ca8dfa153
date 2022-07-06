@@ -1,0 +1,12 @@
+
+W	java:S107"BConstructor has 11 parameters, which is greater than 7 authorized.(ÕœÍç
+G
+java:S1068",Remove this unused "vencedor" private field.(ç½¡‘úÿÿÿÿ
+?
+java:S1068	")Remove this unused "arena" private field.(‚å†
+G
+java:S1068"2Remove this unused "estadoMandante" private field.(ÇÅÎ,
+I
+java:S1068"3Remove this unused "estadoVisitante" private field.(›µ¶
+H
+java:S1068"2Remove this unused "estadoVencedor" private field.(ÖÈÓ

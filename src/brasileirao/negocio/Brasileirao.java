@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Function;
@@ -139,7 +140,38 @@ public class Brasileirao {
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
-        return null;
+        Map<Time, Map<Boolean, List<Jogo>>> matchesByHomeTeam =
+                                        todosOsJogosPorTimeComoMandantes().
+                                        entrySet().
+                                        stream().
+                                        collect(Collectors.toMap(Map.Entry::getKey,
+                                                                 entry -> {
+                                                                     Map<Boolean, List<Jogo>> map = new HashMap<>();
+                                                                     map.put(true, entry.getValue());
+                                                                     return map;
+                                                                 }));
+
+        Map<Time, Map<Boolean, List<Jogo>>> matchesByAwayTeam =
+                                        todosOsJogosPorTimeComoVisitante().
+                                        entrySet().
+                                        stream().
+                                        collect(Collectors.toMap(Map.Entry::getKey,
+                                                                 entry -> {
+                                                                     Map<Boolean, List<Jogo>> map = new HashMap<>();
+                                                                     map.put(false, entry.getValue());
+                                                                     return map;
+                                                                 }));
+
+        return Stream.of(matchesByHomeTeam, matchesByAwayTeam).
+                      flatMap(map -> map.entrySet().stream()).
+                      collect(Collectors.toMap(Map.Entry::getKey,
+                                               Entry::getValue,
+                                               (map1, map2) -> {
+                                                   Map<Boolean, List<Jogo>> map3 = new HashMap<>();
+                                                   map3.putAll(map1);
+                                                   map3.putAll(map2);
+                                                   return map3;
+                                               })); //groupingBy(entry -> entry.getKey()));
     }
 
     public Set<PosicaoTabela> tabela() {

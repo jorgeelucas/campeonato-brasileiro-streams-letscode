@@ -3,6 +3,7 @@ package brasileirao;
 import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
+import brasileirao.dominio.Time;
 import brasileirao.negocio.Brasileirao;
 
 import java.io.IOException;
@@ -18,10 +19,10 @@ public class TestandoBrasileirao {
 
         Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
 
-//        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
-//        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
-//        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
+        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
+        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
+//        Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
+        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
@@ -29,7 +30,7 @@ public class TestandoBrasileirao {
 //
         imprimirEstatisticas(brasileirao);
 //
-//        imprimirTabela(posicoes);
+        imprimirTabela(posicoes);
 
     }
 
@@ -39,7 +40,6 @@ public class TestandoBrasileirao {
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());
         System.out.println("Estatisticas (Total de jogos) - " + statistics.getCount());
         System.out.println("Estatisticas (Media de gols) - " + statistics.getAverage());
-
         Map.Entry<Resultado, Long> placarMaisRepetido = brasileirao.placarMaisRepetido();
 
         System.out.println("Estatisticas (Placar mais repetido) - "

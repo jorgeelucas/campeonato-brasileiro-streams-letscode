@@ -35,6 +35,10 @@ public class TestandoBrasileirao {
     private static void imprimirEstatisticas(Brasileirao brasileirao) {
         IntSummaryStatistics statistics = brasileirao.estatisticasPorJogo();
 
+        //brasileirao.todosOsPlacares().forEach( (k,v) -> System.out.println( k.toString()+" - "+v.toString() ));
+
+        System.out.println(brasileirao.todosOsJogosPorTime().toString());
+
         System.out.println("Estatisticas (Total de gols) - " + statistics.getSum());
         System.out.println("Estatisticas (Total de jogos) - " + statistics.getCount());
         System.out.println("Estatisticas (Media de gols) - " + statistics.getAverage());

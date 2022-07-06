@@ -197,9 +197,8 @@ public class Brasileirao {
                 }
 
                 DataDoJogo matchDate = new DataDoJogo(LocalDate.parse(matchData[1], DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        LocalTime.parse(hourString, DateTimeFormatter.ofPattern("HH:mm")),
-                        getDayOfWeek(matchData[3]));
-                // DayOfWeek.valueOf(matchData[3]));
+                                                      LocalTime.parse(hourString, DateTimeFormatter.ofPattern("HH:mm")),
+                                                      getDayOfWeek(matchData[3]));
 
                 Jogo match = new Jogo(Integer.valueOf(matchData[0]),  // Integer rodada
                                       matchDate,                      // DataDoJogo data
@@ -236,8 +235,10 @@ public class Brasileirao {
 
     // METODOS EXTRA
 
-    private Map<Integer, Integer> totalGolsPorRodada() {
-        return Collections.emptyMap();
+    public Map<Integer, Integer> totalGolsPorRodada() {
+        return jogos.stream().collect(Collectors.toMap(Jogo::getRodada,
+                                                       jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar(),
+                                                       Integer::sum));
     }
 
     private Map<Time, Integer> totalDeGolsPorTime() {

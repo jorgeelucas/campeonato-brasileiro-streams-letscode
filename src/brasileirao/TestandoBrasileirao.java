@@ -19,8 +19,8 @@ public class TestandoBrasileirao {
 
 //        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
 //        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
-        Predicate<Jogo> filtro = jogo -> jogo.getData().getData().getYear() == 2014;
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
+        Predicate<Jogo> filtro = jogo -> jogo.getData().getData().getYear() == 2014;
 
         Brasileirao brasileirao = new Brasileirao(file, filtro);
 
@@ -65,7 +65,7 @@ public class TestandoBrasileirao {
 
     private static void imprimirTabela(Set<PosicaoTabela> posicoes) {
         System.out.println();
-        System.out.println("## TABELA CAMPEONADO BRASILEIRO: ##");
+        System.out.println("## TABELA CAMPEONATO BRASILEIRO DE FUTEBOL: ##");
 
         int colocacao = 1;
 

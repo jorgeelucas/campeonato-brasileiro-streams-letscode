@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Brasileirao {
     private final Map<Integer, List<Jogo>> brasileiraoByRound;
@@ -120,24 +121,21 @@ public class Brasileirao {
         return Collections.emptyList();
     }
 
-    /**
-     * todos os jogos que cada time foi mandante
-     * @return Map<Time, List<Jogo>>
-     */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+        return this.jogos.stream().collect(Collectors.groupingBy(Jogo::getMandante));
     }
 
-    /**
-     * todos os jogos que cada time foi visitante
-     * @return Map<Time, List<Jogo>>
-     */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+        return this.jogos.stream().collect(Collectors.groupingBy(Jogo::getVisitante));
     }
 
     public Map<Time, List<Jogo>> todosOsJogosPorTime() {
-        return null;
+        return Stream.of(todosOsJogosPorTimeComoMandantes(), todosOsJogosPorTimeComoVisitante()).
+                      flatMap(map -> map.entrySet().stream()).
+                      collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (list1, list2) -> {
+                                                                                            list1.addAll(list2);
+                                                                                            return list1;
+                                                                                        }));
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
@@ -145,6 +143,7 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
+
         return null; //talvez seja um groupingby nome do time, somando as coisas
     }
 

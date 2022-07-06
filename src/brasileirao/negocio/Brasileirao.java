@@ -1,13 +1,14 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.Jogo;
-import brasileirao.dominio.PosicaoTabela;
-import brasileirao.dominio.Resultado;
-import brasileirao.dominio.Time;
+import brasileirao.dominio.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -180,7 +181,35 @@ public class Brasileirao {
     }
 
     public List<Jogo> lerArquivo(Path file) throws IOException {
-        return null;
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH'h'mm");
+
+        List<Jogo> jogos = new ArrayList<>();
+        try (Stream<String> linhas = Files.lines(file).skip(1)) {
+            linhas
+                    .map(linha -> linha.split(";"))
+                    .map(info -> new Jogo(
+                            Integer.parseInt(info[0]),
+                            new DataDoJogo( LocalDate.parse(info[1], dateFormatter),
+                                    info[2].isEmpty() ? LocalTime.parse("16h00", timeFormatter)
+                                            : LocalTime.parse(info[2].replace("h",":"), timeFormatter),
+                                    getDayOfWeek(info[3].toLowerCase())),
+                            new Time(info[4]),
+                            new Time(info[5]),
+                            new Time(info[6]),
+                            info[7],
+                            Integer.parseInt(info[8]),
+                            Integer.parseInt(info[9]),
+                            info[10],
+                            info[11],
+                            info[12]))
+                    .forEach(jogos::add);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return jogos;
     }
 
     private DayOfWeek getDayOfWeek(String dia) {
@@ -234,20 +263,28 @@ public class Brasileirao {
     }
 
     private Long totalDeGolsPorTime(Time time){
-        return (long) todosOsJogosPorTime()
+        return todosOsJogosPorTime()
                 .get(time)
                 .stream()
-                .mapToInt(jogo -> jogo.mandante().toString().equals(time.toString())? jogo.mandantePlacar() : jogo.visitantePlacar())
+                .mapToLong(jogo -> {
+                    if(jogo.mandante().toString().equals(time.toString())){
+                        return jogo.mandantePlacar();
+                    } else if (jogo.visitante().toString().equals(time.toString())) {
+                        return jogo.visitantePlacar();
+                    }
+                    return 0;
+                })
                 .sum();
     }
 
     private Long totalDeGolsSofridosPorTime(Time time){
-        return (long) todosOsJogosPorTime().get(time)
+        return todosOsJogosPorTime()
+                .get(time)
                 .stream()
-                .mapToInt(jogo -> {
-                    if(!jogo.mandante().equals(time)){
+                .mapToLong(jogo -> {
+                    if(!jogo.mandante().toString().equals(time.toString())){
                         return jogo.mandantePlacar();
-                    } else if (!jogo.visitante().equals(time)) {
+                    } else if (!jogo.visitante().toString().equals(time.toString())) {
                         return jogo.visitantePlacar();
                     }
                     return 0;

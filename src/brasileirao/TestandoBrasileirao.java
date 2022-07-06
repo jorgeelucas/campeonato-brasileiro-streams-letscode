@@ -17,9 +17,11 @@ public class TestandoBrasileirao {
     public static void main(String[] args) throws IOException {
 
         Path file = Path.of("campeonatos-brasileiro-pontos-corridos.csv");
+        System.out.println(file.getFileName());
 
-//        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
-//        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
+
+        Predicate<Jogo> brasileiraoPorAno = (jogo) -> jogo.data().data().getYear() == 2020;
+        Predicate<Jogo> brasileiraoPorAno2 = (jogo) -> jogo.data().data().getYear() == 2021;
         Predicate<Jogo> filtro = (jogo) -> jogo.data().data().getYear() == 2014;
 //        Predicate<Jogo> filtro = brasileiraoPorAno.or(brasileiraoPorAno2);
 

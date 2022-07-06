@@ -44,6 +44,8 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
+
+
         return null;
     }
 
@@ -106,7 +108,9 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return null;
+        return todosOsJogos()
+                .stream()
+                .collect(Collectors.groupingBy(Jogo::mandante));
     }
 
     /**
@@ -114,15 +118,26 @@ public class Brasileirao {
      * @return Map<Time, List<Jogo>>
      */
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return null;
+        return todosOsJogos()
+                .stream()
+                .collect(Collectors.groupingBy(Jogo::visitante));
     }
 
-    public Map<Time, List<Jogo>> todosOsJogosPorTime() {
+    public Map<Time, List<Jogo>> todosOsJogosPorTime(){
+        
         return null;
     }
 
     public Map<Time, Map<Boolean, List<Jogo>>> jogosParticionadosPorMandanteTrueVisitanteFalse() {
-        return null;
+        return todosOsJogosPorTime()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entryset -> entryset.getKey(),
+                        entryset -> entryset.getValue().stream().collect(Collectors.partitioningBy(
+                                jogo -> entryset.getKey().nome().equals(jogo.mandante())
+                        ))
+                ));
     }
 
     public Set<PosicaoTabela> tabela() {

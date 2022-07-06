@@ -271,7 +271,10 @@ public class Brasileirao {
                                                                                               Integer::sum));
     }
 
-    private Map<Integer, Double> mediaDeGolsPorRodada() {
-        return Collections.emptyMap();
+    public Map<Integer, Double> mediaDeGolsPorRodada() {
+        return jogos.stream().
+                     collect(Collectors.groupingBy(Jogo::getRodada,
+                                                   Collectors.averagingDouble(match -> match.getMandantePlacar() +
+                                                                                       match.getVisitantePlacar())));
     }
 }

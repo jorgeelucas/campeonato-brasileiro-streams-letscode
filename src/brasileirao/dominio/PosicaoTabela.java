@@ -1,6 +1,8 @@
 package brasileirao.dominio;
 
-public class PosicaoTabela {
+import java.util.Objects;
+
+public class PosicaoTabela implements Comparable<PosicaoTabela> {
     private final Time time;
     private final Long vitorias;
     private final Long derrotas;
@@ -9,8 +11,8 @@ public class PosicaoTabela {
     private final Long golsSofridos;
     private final Long saldoDeGols;
 
-    PosicaoTabela(Time pTime, Long pVitorias, Long pDerrotas, Long pEmpates,
-                  Long pGolsPositivos, Long pGolsSofridos, Long pSaldoDeGols) {
+    public PosicaoTabela(Time pTime, Long pVitorias, Long pDerrotas, Long pEmpates,
+                         Long pGolsPositivos, Long pGolsSofridos, Long pSaldoDeGols) {
         this.time = pTime;
         this.vitorias = pVitorias;
         this.derrotas = pDerrotas;
@@ -35,5 +37,27 @@ public class PosicaoTabela {
                 ", golsSofridos=" + golsSofridos +
                 ", saldoDeGols=" + saldoDeGols +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PosicaoTabela that = (PosicaoTabela) o;
+        return Objects.equals(time, that.time) && Objects.equals(vitorias, that.vitorias) && Objects.equals(derrotas, that.derrotas) && Objects.equals(empates, that.empates) && Objects.equals(golsPositivos, that.golsPositivos) && Objects.equals(golsSofridos, that.golsSofridos) && Objects.equals(saldoDeGols, that.saldoDeGols);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(time, vitorias, derrotas, empates, golsPositivos, golsSofridos, saldoDeGols);
+    }
+
+    @Override
+    public int compareTo(PosicaoTabela o) {
+        if (this.getPontuacaoTotal() > o.getPontuacaoTotal()) {
+            return -1;
+        } else if (this.getPontuacaoTotal() < o.getPontuacaoTotal()) {
+            return 1;
+        } else return o.saldoDeGols.compareTo(this.saldoDeGols);
     }
 }

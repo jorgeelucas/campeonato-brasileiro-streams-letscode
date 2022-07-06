@@ -60,4 +60,8 @@ public class Jogo {
     public int getVisitantePlacar() {
         return visitantePlacar;
     }
+
+    public Time getVencedor() {
+        return this.vencedor;
+    }
 }

@@ -16,7 +16,9 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IntSummaryStatistics;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -130,7 +132,7 @@ public class Brasileirao {
         return this.jogos.stream().collect(Collectors.groupingBy(Jogo::getVisitante));
     }
 
-    public Map<Time, List<Jogo>> todosOsJogosPorTime() {
+    private Map<Time, List<Jogo>> todosOsJogosPorTime() {
         return Stream.of(todosOsJogosPorTimeComoMandantes(), todosOsJogosPorTimeComoVisitante()).
                       flatMap(map -> map.entrySet().stream()).
                       collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (list1, list2) -> {
@@ -175,8 +177,40 @@ public class Brasileirao {
     }
 
     public Set<PosicaoTabela> tabela() {
+        Set<PosicaoTabela> table = new HashSet<>();
 
-        return null; //talvez seja um groupingby nome do time, somando as coisas
+        todosOsJogosPorTime().forEach((key, value) -> {
+            long numberOfWins = value.stream().filter(match -> match.getVencedor().equals(key)).count();
+            long numberOfDraws = value.stream().filter(match -> match.getMandantePlacar() == match.getVisitantePlacar()).count();
+            long numberOfLosses = value.size() - numberOfWins - numberOfDraws;
+            System.out.println("w: " + numberOfWins + " l: " + numberOfLosses + " d: " + numberOfDraws);
+            long numberOfGoalsScoredWhileHomeTeam = value.stream().filter(match -> match.getMandante().equals(key)).mapToLong(Jogo::getMandantePlacar).sum();
+            long numberOfGoalsScoredWhileVisitingTeam = value.stream().filter(match -> !match.getMandante().equals(key)).mapToLong(Jogo::getVisitantePlacar).sum();
+
+            long numberOfGoalsConcededWhileHomeTeam = value.stream().filter(match -> match.getMandante().equals(key)).mapToInt(Jogo::getVisitantePlacar).sum();
+            long numberOfGoalsConcededWhileVisitingTeam = value.stream().filter(match -> !match.getMandante().equals(key)).mapToInt(Jogo::getMandantePlacar).sum();
+
+            long numberOfGoalsScored = numberOfGoalsScoredWhileHomeTeam + numberOfGoalsScoredWhileVisitingTeam;
+            long numberOfGoalsConceded = numberOfGoalsConcededWhileHomeTeam + numberOfGoalsConcededWhileVisitingTeam;
+
+            PosicaoTabela tableEntry = new PosicaoTabela(key,
+                    numberOfWins,
+                    numberOfLosses,
+                    numberOfDraws,
+                    numberOfGoalsScored,
+                    numberOfGoalsConceded,
+                    numberOfGoalsScored - numberOfGoalsConceded);
+
+//            if (table.
+
+            table.add(tableEntry);
+
+//            System.out.println(entry.getKey() + ", pontos=" + entry.getKey().getPontuacaoTotal());
+
+
+        });
+
+        return table.stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new)); //talvez seja um groupingby nome do time, somando as coisas
     }
 
     private List<Jogo> lerArquivo(Path file) throws IOException {

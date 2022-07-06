@@ -1,30 +1,17 @@
 package brasileirao.negocio;
 
-import brasileirao.dominio.DataDoJogo;
 import brasileirao.dominio.Jogo;
 import brasileirao.dominio.PosicaoTabela;
 import brasileirao.dominio.Resultado;
 import brasileirao.dominio.Time;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Brasileirao {
 
@@ -43,34 +30,50 @@ public class Brasileirao {
 
     }
 
-    public Map<Jogo, Integer> mediaGolsPorJogo() {
-
-
-        return null;
+    public Map<Jogo, Double> mediaGolsPorJogo() {
+        return jogos.stream()
+                .filter(filtro)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.averagingDouble(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar())
+                ));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
-        return null;
+        return todosOsJogos().stream()
+                .collect(Collectors.summarizingInt(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar()));
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return jogos.stream()
+                .filter(filtro)
+                .toList();
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.mandantePlacar() > jogo.visitantePlacar())
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.visitantePlacar() > jogo.mandantePlacar())
+                .count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> Objects.equals(jogo.mandantePlacar(), jogo.visitantePlacar()))
+                .count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+
+        return todosOsJogos().stream()
+                .filter(jogo -> (jogo.visitantePlacar() + jogo.mandantePlacar()) >= 3)
+                .count();
     }
 
     public Long totalJogosCom3OuMaisGols() {

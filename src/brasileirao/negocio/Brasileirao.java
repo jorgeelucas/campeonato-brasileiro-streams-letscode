@@ -69,15 +69,21 @@ public class Brasileirao {
     }
 
     public Long totalVitoriasEmCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.vencedor().equals(jogo.mandante()))
+                .count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.vencedor().equals(jogo.visitante()))
+                .count();
     }
 
     public Long totalEmpates() {
-        return null;
+        return todosOsJogos().stream()
+                .filter(jogo -> jogo.vencedor().nome().equals("-"))
+                .count();
     }
 
     public Long totalJogosComMenosDe3Gols() {

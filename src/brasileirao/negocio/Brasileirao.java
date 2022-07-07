@@ -63,7 +63,9 @@ public class Brasileirao {
     }
 
     public List<Jogo> todosOsJogos() {
-        return jogos;
+        return jogos.stream()
+                .filter(filtro)
+                .toList();
     }
 
     public Long totalVitoriasEmCasa() {
@@ -79,11 +81,17 @@ public class Brasileirao {
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return null;
+        return todosOsJogos()
+                .stream()
+                .filter(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar() < 3)
+                .count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return null;
+        return todosOsJogos()
+                .stream()
+                .filter(jogo -> jogo.mandantePlacar() + jogo.visitantePlacar() >= 3)
+                .count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {

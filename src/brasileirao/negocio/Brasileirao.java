@@ -63,7 +63,7 @@ public class Brasileirao {
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return jogos;
     }
 
     public Long totalVitoriasEmCasa() {
@@ -87,15 +87,23 @@ public class Brasileirao {
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
+        return todosOsJogos().stream()
+                .collect(Collectors.groupingBy(jogo -> new Resultado(jogo.mandantePlacar(),
+                        jogo.visitantePlacar()), Collectors.counting()));
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+        return todosOsPlacares().entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
+        return todosOsPlacares().entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue())
+                .orElse(null);
     }
 
     private List<Time> todosOsTimes() {

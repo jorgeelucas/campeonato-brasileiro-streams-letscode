@@ -181,14 +181,24 @@ public class Brasileirao {
 
         todosOsJogosPorTime().forEach((key, value) -> {
             long numberOfWins = value.stream().filter(match -> match.getVencedor().equals(key)).count();
-            long numberOfDraws = value.stream().filter(match -> match.getMandantePlacar() == match.getVisitantePlacar()).count();
+            long numberOfDraws = value.stream().
+                                       filter(match -> match.getMandantePlacar() == match.getVisitantePlacar()).
+                                       count();
             long numberOfLosses = value.size() - numberOfWins - numberOfDraws;
 
-            long numberOfGoalsScoredWhileHomeTeam = value.stream().filter(match -> match.getMandante().equals(key)).mapToLong(Jogo::getMandantePlacar).sum();
-            long numberOfGoalsScoredWhileVisitingTeam = value.stream().filter(match -> !match.getMandante().equals(key)).mapToLong(Jogo::getVisitantePlacar).sum();
+            long numberOfGoalsScoredWhileHomeTeam = value.stream().
+                                                          filter(match -> match.getMandante().equals(key)).
+                                                          mapToLong(Jogo::getMandantePlacar).sum();
+            long numberOfGoalsScoredWhileVisitingTeam = value.stream().
+                                                              filter(match -> !match.getMandante().equals(key)).
+                                                              mapToLong(Jogo::getVisitantePlacar).sum();
 
-            long numberOfGoalsConcededWhileHomeTeam = value.stream().filter(match -> match.getMandante().equals(key)).mapToInt(Jogo::getVisitantePlacar).sum();
-            long numberOfGoalsConcededWhileVisitingTeam = value.stream().filter(match -> !match.getMandante().equals(key)).mapToInt(Jogo::getMandantePlacar).sum();
+            long numberOfGoalsConcededWhileHomeTeam = value.stream().
+                                                            filter(match -> match.getMandante().equals(key)).
+                                                            mapToInt(Jogo::getVisitantePlacar).sum();
+            long numberOfGoalsConcededWhileVisitingTeam = value.stream().
+                                                                filter(match -> !match.getMandante().equals(key)).
+                                                                mapToInt(Jogo::getMandantePlacar).sum();
 
             long numberOfGoalsScored = numberOfGoalsScoredWhileHomeTeam + numberOfGoalsScoredWhileVisitingTeam;
             long numberOfGoalsConceded = numberOfGoalsConcededWhileHomeTeam + numberOfGoalsConcededWhileVisitingTeam;
@@ -294,11 +304,9 @@ public class Brasileirao {
                                                                    mapToInt(Jogo::getVisitantePlacar).
                                                                    sum()));
 
-        return Stream.of(numberOfGoalsPerHomeTeam, numberOfGoalsPerVisitingTeam).flatMap(map -> map.entrySet().stream()).
-                                                                                        collect(Collectors.
-                                                                                        toMap(Entry::getKey,
-                                                                                              Entry::getValue,
-                                                                                              Integer::sum));
+        return Stream.of(numberOfGoalsPerHomeTeam, numberOfGoalsPerVisitingTeam).
+                      flatMap(map -> map.entrySet().stream()).
+                      collect(Collectors.toMap(Entry::getKey, Entry::getValue, Integer::sum));
     }
 
     public Map<Integer, Double> mediaDeGolsPorRodada() {

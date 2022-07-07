@@ -33,6 +33,7 @@ public class Brasileirao {
     private final Map<Integer, List<Jogo>> brasileiraoByRound;
     private final List<Jogo> jogos;
     private final Predicate<Jogo> filtro;
+    private final List<Jogo> matchesFilteredByYear;
 
     public Brasileirao(Path arquivo, Predicate<Jogo> filtro) throws IOException {
         this.jogos = lerArquivo(arquivo);
@@ -42,10 +43,11 @@ public class Brasileirao {
                                        .collect(Collectors.groupingBy(Jogo::getRodada,
                                                                       Collectors.mapping(Function.identity(),
                                                                                          Collectors.toList())));
+        this.matchesFilteredByYear = jogos.stream().filter(filtro).collect(Collectors.toList());
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return this.jogos.
+        return this.matchesFilteredByYear.
                     stream().
                     collect(Collectors.toMap(Function.identity(),
                                              match -> (match.getMandantePlacar() + match.getVisitantePlacar()) / 2));
@@ -54,37 +56,37 @@ public class Brasileirao {
     public IntSummaryStatistics estatisticasPorJogo() {
         //total de gol, total de jogos, media de gols
 
-        return this.jogos.stream()
+        return this.matchesFilteredByYear.stream()
                          .mapToInt(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar())
                          .summaryStatistics();
     }
 
     private List<Jogo> todosOsJogos() {
-        return this.jogos;
+        return this.matchesFilteredByYear;
     }
 
     public Long totalVitoriasEmCasa() {
-        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() > jogo.getVisitantePlacar()).count();
+        return this.matchesFilteredByYear.stream().filter(jogo -> jogo.getMandantePlacar() > jogo.getVisitantePlacar()).count();
     }
 
     public Long totalVitoriasForaDeCasa() {
-        return this.jogos.stream().filter(jogo -> jogo.getVisitantePlacar() > jogo.getMandantePlacar()).count();
+        return this.matchesFilteredByYear.stream().filter(jogo -> jogo.getVisitantePlacar() > jogo.getMandantePlacar()).count();
     }
 
     public Long totalEmpates() {
-        return this.jogos.stream().filter(jogo -> jogo.getVisitantePlacar() == jogo.getMandantePlacar()).count();
+        return this.matchesFilteredByYear.stream().filter(jogo -> jogo.getVisitantePlacar() == jogo.getMandantePlacar()).count();
     }
 
     public Long totalJogosComMenosDe3Gols() {
-        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() < 3).count();
+        return this.matchesFilteredByYear.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() < 3).count();
     }
 
     public Long totalJogosCom3OuMaisGols() {
-        return this.jogos.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() >= 3).count();
+        return this.matchesFilteredByYear.stream().filter(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar() >= 3).count();
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return this.jogos.stream().
+        return this.matchesFilteredByYear.stream().
                           map(match -> new Resultado(match.getMandantePlacar(), match.getVisitantePlacar())).
                           collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
@@ -92,7 +94,7 @@ public class Brasileirao {
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
         AbstractMap.SimpleEntry<Resultado, Long> emptyMapEntry = new AbstractMap.SimpleEntry<>(new Resultado(0,0), 0L);
 
-        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
+        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.matchesFilteredByYear.stream().
                                        map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
                                        collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -102,7 +104,7 @@ public class Brasileirao {
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
         AbstractMap.SimpleEntry<Resultado, Long> emptyMapEntry = new AbstractMap.SimpleEntry<>(new Resultado(0,0), 0L);
 
-        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
+        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.matchesFilteredByYear.stream().
                 map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
                 collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -125,11 +127,11 @@ public class Brasileirao {
     }
 
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
-        return this.jogos.stream().collect(Collectors.groupingBy(Jogo::getMandante));
+        return this.matchesFilteredByYear.stream().collect(Collectors.groupingBy(Jogo::getMandante));
     }
 
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoVisitante() {
-        return this.jogos.stream().collect(Collectors.groupingBy(Jogo::getVisitante));
+        return this.matchesFilteredByYear.stream().collect(Collectors.groupingBy(Jogo::getVisitante));
     }
 
     private Map<Time, List<Jogo>> todosOsJogosPorTime() {
@@ -276,7 +278,7 @@ public class Brasileirao {
     // METODOS EXTRA
 
     public Map<Integer, Integer> totalGolsPorRodada() {
-        return jogos.stream().collect(Collectors.toMap(Jogo::getRodada,
+        return matchesFilteredByYear.stream().collect(Collectors.toMap(Jogo::getRodada,
                                                        jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar(),
                                                        Integer::sum));
     }
@@ -310,7 +312,7 @@ public class Brasileirao {
     }
 
     public Map<Integer, Double> mediaDeGolsPorRodada() {
-        return jogos.stream().
+        return matchesFilteredByYear.stream().
                      collect(Collectors.groupingBy(Jogo::getRodada,
                                                    Collectors.averagingDouble(match -> match.getMandantePlacar() +
                                                                                        match.getVisitantePlacar())));

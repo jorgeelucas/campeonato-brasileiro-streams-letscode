@@ -50,7 +50,6 @@ public class Brasileirao {
 
     public IntSummaryStatistics estatisticasPorJogo() {
         //total de gol, total de jogos, media de gols
-       // total de jogos = this.jogos.size(); /// nao, transformar numa Integerstream e egar o intSumStats
 
         return this.jogos.stream()
                          .mapToInt(jogo -> jogo.getMandantePlacar() + jogo.getVisitantePlacar())
@@ -58,7 +57,7 @@ public class Brasileirao {
     }
 
     private List<Jogo> todosOsJogos() {
-        return null;
+        return this.jogos;
     }
 
     public Long totalVitoriasEmCasa() {
@@ -82,7 +81,9 @@ public class Brasileirao {
     }
 
     public Map<Resultado, Long> todosOsPlacares() {
-        return null;
+        return this.jogos.stream().
+                          map(match -> new Resultado(match.getMandantePlacar(), match.getVisitantePlacar())).
+                          collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {

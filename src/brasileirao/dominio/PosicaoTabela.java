@@ -3,6 +3,8 @@ package brasileirao.dominio;
 import java.util.Objects;
 
 public class PosicaoTabela implements Comparable<PosicaoTabela> {
+    private static final byte POINTS_PER_WIN = 3;
+
     private final Time time;
     private final Long vitorias;
     private final Long derrotas;
@@ -23,7 +25,7 @@ public class PosicaoTabela implements Comparable<PosicaoTabela> {
     }
 
     private Long getPontuacaoTotal() {
-        return (vitorias * 3) + empates;
+        return (vitorias * POINTS_PER_WIN) + empates;
     }
 
     @Override

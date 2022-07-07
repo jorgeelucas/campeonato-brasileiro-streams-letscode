@@ -14,7 +14,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
@@ -45,7 +45,10 @@ public class Brasileirao {
     }
 
     public Map<Jogo, Integer> mediaGolsPorJogo() {
-        return null;
+        return this.jogos.
+                    stream().
+                    collect(Collectors.toMap(Function.identity(),
+                                             match -> (match.getMandantePlacar() + match.getVisitantePlacar()) / 2));
     }
 
     public IntSummaryStatistics estatisticasPorJogo() {
@@ -87,33 +90,29 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        Map.Entry<Resultado, Long> emptyEntry = new AbstractMap.SimpleEntry<>(new Resultado(0, 0), 0L);
+        AbstractMap.SimpleEntry<Resultado, Long> emptyMapEntry = new AbstractMap.SimpleEntry<>(new Resultado(0,0), 0L);
 
-         Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
+        Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
                                        map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
                                        collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-         return resultsByNumberOfOccurrences.entrySet().stream().max(Map.Entry.comparingByValue()).get();
-
-//                entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).orElse(emptyEntry);
-
-//                          entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).
-//                          orElse(  emptyEntry  )   ;
-//                                  ,  Collectors.summingLong());
-//                          sorted().
-//                          findFirst();
+         return resultsByNumberOfOccurrences.entrySet().stream().max(Map.Entry.comparingByValue()).orElse(emptyMapEntry);
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        Map.Entry<Resultado, Long> emptyEntry = new AbstractMap.SimpleEntry<>(new Resultado(0, 0), 0L);
+        AbstractMap.SimpleEntry<Resultado, Long> emptyMapEntry = new AbstractMap.SimpleEntry<>(new Resultado(0,0), 0L);
 
         Map<Resultado, Long> resultsByNumberOfOccurrences =  this.jogos.stream().
                 map(jogo -> new Resultado(jogo.getMandantePlacar(), jogo.getVisitantePlacar())).
                 collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        return resultsByNumberOfOccurrences.entrySet().stream().max((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())).get();    }
+        return resultsByNumberOfOccurrences.entrySet().stream().
+                                                       max((entry1, entry2) -> entry2.getValue().
+                                                                                      compareTo(entry1.getValue())).
+                                                       orElse(emptyMapEntry);
+    }
 
-    private List<Time> todosOsTimes() {
+    public List<Time> todosOsTimes() {
         List<Time> mandantes = todosOsJogos().stream()
                                              .map(Jogo::getMandante)
                                              .collect(Collectors.toList());
@@ -122,7 +121,7 @@ public class Brasileirao {
                                               .map(Jogo::getVisitante)
                                               .collect(Collectors.toList());
 
-        return Collections.emptyList();
+        return Stream.of(mandantes, visitantes).flatMap(Collection::stream).distinct().collect(Collectors.toList());
     }
 
     private Map<Time, List<Jogo>> todosOsJogosPorTimeComoMandantes() {
@@ -174,7 +173,7 @@ public class Brasileirao {
                                                    map3.putAll(map1);
                                                    map3.putAll(map2);
                                                    return map3;
-                                               })); //groupingBy(entry -> entry.getKey()));
+                                               }));
     }
 
     public Set<PosicaoTabela> tabela() {
@@ -184,7 +183,7 @@ public class Brasileirao {
             long numberOfWins = value.stream().filter(match -> match.getVencedor().equals(key)).count();
             long numberOfDraws = value.stream().filter(match -> match.getMandantePlacar() == match.getVisitantePlacar()).count();
             long numberOfLosses = value.size() - numberOfWins - numberOfDraws;
-            System.out.println("w: " + numberOfWins + " l: " + numberOfLosses + " d: " + numberOfDraws);
+
             long numberOfGoalsScoredWhileHomeTeam = value.stream().filter(match -> match.getMandante().equals(key)).mapToLong(Jogo::getMandantePlacar).sum();
             long numberOfGoalsScoredWhileVisitingTeam = value.stream().filter(match -> !match.getMandante().equals(key)).mapToLong(Jogo::getVisitantePlacar).sum();
 
@@ -195,23 +194,17 @@ public class Brasileirao {
             long numberOfGoalsConceded = numberOfGoalsConcededWhileHomeTeam + numberOfGoalsConcededWhileVisitingTeam;
 
             PosicaoTabela tableEntry = new PosicaoTabela(key,
-                    numberOfWins,
-                    numberOfLosses,
-                    numberOfDraws,
-                    numberOfGoalsScored,
-                    numberOfGoalsConceded,
-                    numberOfGoalsScored - numberOfGoalsConceded);
-
-//            if (table.
+                                                         numberOfWins,
+                                                         numberOfLosses,
+                                                         numberOfDraws,
+                                                         numberOfGoalsScored,
+                                                         numberOfGoalsConceded,
+                                                         numberOfGoalsScored - numberOfGoalsConceded);
 
             table.add(tableEntry);
-
-//            System.out.println(entry.getKey() + ", pontos=" + entry.getKey().getPontuacaoTotal());
-
-
         });
 
-        return table.stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new)); //talvez seja um groupingby nome do time, somando as coisas
+        return table.stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private List<Jogo> lerArquivo(Path file) throws IOException {
@@ -231,8 +224,10 @@ public class Brasileirao {
                     hourString = "00:00";
                 }
 
-                DataDoJogo matchDate = new DataDoJogo(LocalDate.parse(matchData[1], DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                                                      LocalTime.parse(hourString, DateTimeFormatter.ofPattern("HH:mm")),
+                DataDoJogo matchDate = new DataDoJogo(LocalDate.parse(matchData[1],
+                                                                      DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                                      LocalTime.parse(hourString,
+                                                                      DateTimeFormatter.ofPattern("HH:mm")),
                                                       getDayOfWeek(matchData[3]));
 
                 Jogo match = new Jogo(Integer.valueOf(matchData[0]),  // Integer rodada

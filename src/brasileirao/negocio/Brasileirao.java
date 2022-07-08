@@ -49,7 +49,7 @@ public class Brasileirao {
     }
 
     public List<Jogo> todosOsJogos() {
-        return null;
+        return this.jogos;
     }
 
     public Long totalVitoriasEmCasa() {
@@ -77,11 +77,47 @@ public class Brasileirao {
     }
 
     public Map.Entry<Resultado, Long> placarMaisRepetido() {
-        return null;
+        Map<Resultado,Long> mapResultados = todosResultados()
+                .stream()
+                .collect(Collectors.toMap(
+                        resultado -> resultado,
+                        resultado -> (long) Collections.frequency(todosResultados(), resultado),
+                        (a,b)->a));
+
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = mapResultados
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue());
+
+        return placarMaisRepetido.orElse(null);
+
+    }
+
+    public List<Resultado> todosResultados(){
+        List<Resultado> resultados = new ArrayList<>();
+        this.jogos.stream()
+                .filter(filtro)
+                .forEach(jogo -> {
+                    assert false;
+                    resultados.add(new Resultado(jogo.mandantePlacar(), jogo.visitantePlacar()));
+                });
+        return resultados;
     }
 
     public Map.Entry<Resultado, Long> placarMenosRepetido() {
-        return null;
+        Map<Resultado,Long> mapResultados = todosResultados()
+                .stream()
+                .collect(Collectors.toMap(
+                        resultado -> resultado,
+                        resultado -> (long) Collections.frequency(todosResultados(), resultado),
+                        (a,b)->a));
+
+        Optional<Map.Entry<Resultado, Long>> placarMaisRepetido = mapResultados
+                .entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue());
+
+        return placarMaisRepetido.orElse(null);
     }
 
     private List<Time> todosOsTimes() {
